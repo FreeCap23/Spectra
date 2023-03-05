@@ -23,7 +23,13 @@ vec3 getColor(Ray& ray) {
     if (determinant > 0) {
         // We will get the shortest t for now
         float t1 = (-h - sqrt(determinant)) / a;
-        return vec3(255, 0, 0);
+        float t2 = (-h + sqrt(determinant)) / a;
+        ray.hits.t_min = t1 < t2 ? t1 : t2;
+        vec3 intersectionPoint = ray.origin + ray.hits.t_min * ray.direction;
+        vec3 normal = glm::normalize(intersectionPoint - sphereCenter);
+        // Map to [0, 1] and multiply by 255 to get a color
+        vec3 normalColor = (normal + float(1.0)) / float(2.0) * float(255.0);
+        return normalColor;
     }
     // Return sky color if no intersection with any objects is found
     // This is the formula for the cosine of the two angles, so we have to map
