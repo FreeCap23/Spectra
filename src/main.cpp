@@ -1,5 +1,7 @@
 #include "Camera.h"
 #include "Ray.h"
+#include "Sphere.h"
+#include "World.h"
 #include "glm/glm.hpp"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
@@ -9,27 +11,18 @@
 #define WIDTH 400
 #define HEIGHT 200
 
+World world;
+
 vec3 getColor(Ray& ray) {
-    // Calculate intersection with a sphere
-    vec3 sphereCenter(0, 1, 0);
-    float radius = 0.5;
-    // h = b/2
-    float a, h, c;
-    a = glm::dot(ray.direction, ray.direction);
-    h = glm::dot(ray.direction, (ray.origin - sphereCenter));
-    c = glm::dot((ray.origin - sphereCenter), (ray.origin - sphereCenter)) - radius * radius;
-    
-    float determinant = h * h - a * c;
-    if (determinant > 0) {
-        // We will get the shortest t for now
-        float t1 = (-h - sqrt(determinant)) / a;
-        float t2 = (-h + sqrt(determinant)) / a;
-        ray.hits.t_min = t1 < t2 ? t1 : t2;
-        vec3 intersectionPoint = ray.origin + ray.hits.t_min * ray.direction;
-        vec3 normal = glm::normalize(intersectionPoint - sphereCenter);
-        // Map to [0, 1] and multiply by 255 to get a color
-        vec3 normalColor = (normal + float(1.0)) / float(2.0) * float(255.0);
-        return normalColor;
+    for (Sphere sphere : world.spheres) {
+        if (sphere.hit(ray)) {
+            vec3 intersectionPoint = ray.origin + ray.hits.t_min * ray.direction;
+            vec3 normal = glm::normalize(intersectionPoint - sphere.center);
+
+            // Map to [0, 1] and multiply by 255 to get a color
+            vec3 normalColor = (normal + float(1.0)) / float(2.0) * float(255.0);
+            return normalColor;
+        }
     }
     // Return sky color if no intersection with any objects is found
     // This is the formula for the cosine of the two angles, so we have to map
@@ -51,16 +44,20 @@ int main() {
     // Setup camera
     Camera camera(vec3(0, 0, 0));
 
-    // Setup ray
-    Ray ray;
-    ray.origin = camera.getPos();
-    ray.direction.y = 1;
+    // Setup world
+    // TODO: Fix having to put these in order
+    world.spheres.push_back(Sphere(vec3(0, 1, 0), 0.5));
+    world.spheres.push_back(Sphere(vec3(0, 4, 0), 2.5));
 
     float aspectRatio = static_cast<float>(WIDTH) / static_cast<float>(HEIGHT);
-
     // Render loop
     for (int i = 0; i < HEIGHT; i++) {
         for (int j = 0; j < WIDTH; j++) {
+            // Setup ray
+            Ray ray;
+            ray.origin = camera.getPos();
+            ray.direction.y = 1;
+
             // Map pixel coordinates to ray direction
             ray.direction.z = i / (HEIGHT / 2.0) - 1.0;
             ray.direction.x = (j / (WIDTH / 2.0) - 1.0) * aspectRatio;
