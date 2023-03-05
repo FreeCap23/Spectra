@@ -50,12 +50,14 @@ int main() {
     ray.origin = camera.getPos();
     ray.direction.y = 1;
 
+    float aspectRatio = static_cast<float>(WIDTH) / static_cast<float>(HEIGHT);
+
     // Render loop
     for (int i = 0; i < HEIGHT; i++) {
         for (int j = 0; j < WIDTH; j++) {
             // Map pixel coordinates to ray direction
             ray.direction.z = i / (HEIGHT / 2.0) - 1.0;
-            ray.direction.x = j / (WIDTH / 2.0) - 1.0;
+            ray.direction.x = (j / (WIDTH / 2.0) - 1.0) * aspectRatio;
 
             // Get color for this pixel
             vec3 color = getColor(ray);
