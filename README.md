@@ -2,6 +2,7 @@
 
 ## Rendered image
 This is the most recent image rendered.
+
 ![Image rendered with Spectra](out.png)
 
 ## Building
