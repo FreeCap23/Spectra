@@ -1,18 +1,17 @@
 #pragma once
-#include <cstdio>
+#include "glm/glm.hpp"
+
+using glm::vec3;
 
 class Camera {
     public:
         Camera() {}
-        Camera(int width, int height, const char* fileName) {
-            m_width = width;
-            m_height = height;
-            m_fileName = fileName;
+        Camera(vec3 pos) {
+            m_pos = pos;
         }
 
-        void render();
+        vec3 getPos();
 
     private:
-        int m_width, m_height;
-        const char* m_fileName;
+        vec3 m_pos;
 };
