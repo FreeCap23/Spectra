@@ -7,9 +7,12 @@
 #include "stb_image_write.h"
 #include <cstdio>
 #include <cstdlib>
+#include <random>
 
-#define WIDTH 400
-#define HEIGHT 200
+#define WIDTH 600
+#define HEIGHT 400
+#define SAMPLES 16 
+#define MULTI_SAMPLE true
 
 World world;
 
@@ -49,6 +52,16 @@ int main() {
     world.spheres.push_back(Sphere(vec3(0, 1, 0), 0.5));
     world.spheres.push_back(Sphere(vec3(0, 4, 0), 2.5));
 
+    // Calculate the size of one pixel
+    float horizontalSize = 1.0 / (WIDTH);
+    float verticalSize = 1.0 / (HEIGHT);
+
+    // Setup random number generator
+    std::random_device rd;
+    std::mt19937 generator(rd());
+    std::uniform_real_distribution<> horizontalDistribution(-horizontalSize, horizontalSize);
+    std::uniform_real_distribution<> verticalDistribution(-verticalSize, verticalSize);
+
     float aspectRatio = static_cast<float>(WIDTH) / static_cast<float>(HEIGHT);
     // Render loop
     for (int i = 0; i < HEIGHT; i++) {
@@ -58,12 +71,23 @@ int main() {
             ray.origin = camera.getPos();
             ray.direction.y = 1;
 
+            #if MULTI_SAMPLE
             // Map pixel coordinates to ray direction
+            float directionZ = i / (HEIGHT / 2.0) - 1.0;
+            float directionX = (j / (WIDTH / 2.0) - 1.0) * aspectRatio;
+
+            // Get color for this pixel by averaging multiple rays
+            vec3 color(0, 0, 0);
+            for (int s = 0; s < SAMPLES; s++) {
+                ray.direction.z = directionZ + horizontalDistribution(generator);
+                ray.direction.x = directionX + horizontalDistribution(generator);
+                color += getColor(ray) * (float)(1.0/SAMPLES);
+            }
+            #else
             ray.direction.z = i / (HEIGHT / 2.0) - 1.0;
             ray.direction.x = (j / (WIDTH / 2.0) - 1.0) * aspectRatio;
-
-            // Get color for this pixel
             vec3 color = getColor(ray);
+            #endif
 
             // Write the color to the image buffer
             data[offset++] = static_cast<uint8_t>(color.x);
