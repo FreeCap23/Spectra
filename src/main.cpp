@@ -11,25 +11,32 @@ vec3 getColor(Ray& ray) {
 
 // TODO: Add argument for file name
 int main() {
-    // Setup file
+    // Setup output file
     FILE* outFile = fopen("out.ppm", "w");
     fprintf(outFile, "P3\n%d %d\n255\n", WIDTH, HEIGHT);
 
-    // Setup scene
+    // Setup camera
     Camera camera(vec3(0, 0, 0));
+
+    // Setup ray
     Ray ray;
     ray.origin = camera.getPos();
     ray.direction.z = 1;
 
-    // Main render loop
+    // Render loop
     for (int i = 0; i < HEIGHT; i++) {
         for (int j = 0; j < WIDTH; j++) {
-            // Map to range [-1, 1]
+            // Map pixel coordinates to ray direction
             ray.direction.y = i / (HEIGHT / 2.0) - 1.0;
             ray.direction.x = j / (WIDTH / 2.0) - 1.0;
+
+            // Get color for this pixel
             vec3 color = getColor(ray);
+
+            // Write the color to the output file
             fprintf(outFile, "%d %d %d ", (int)color.x, (int)color.y, (int)color.z);
         }
+        // Write newline at the end of the row
         fprintf(outFile, "\n");
     }
 
