@@ -57,8 +57,7 @@ int main() {
     float verticalSize = 1.0 / (HEIGHT);
 
     // Setup random number generator
-    std::random_device rd;
-    std::mt19937 generator(rd());
+    std::mt19937 generator(1);
     std::uniform_real_distribution<> horizontalDistribution(-horizontalSize, horizontalSize);
     std::uniform_real_distribution<> verticalDistribution(-verticalSize, verticalSize);
 
