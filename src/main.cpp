@@ -10,10 +10,25 @@
 #define HEIGHT 200
 
 vec3 getColor(Ray& ray) {
+    // Calculate intersection with a sphere
+    vec3 sphereCenter(0, 1, 0);
+    float radius = 0.5;
+    // h = b/2
+    float a, h, c;
+    a = glm::dot(ray.direction, ray.direction);
+    h = glm::dot(ray.direction, (ray.origin - sphereCenter));
+    c = glm::dot((ray.origin - sphereCenter), (ray.origin - sphereCenter)) - radius * radius;
+    
+    float determinant = h * h - a * c;
+    if (determinant > 0) {
+        // We will get the shortest t for now
+        float t1 = (-h - sqrt(determinant)) / a;
+        return vec3(255, 0, 0);
+    }
     // Return sky color if no intersection with any objects is found
     // This is the formula for the cosine of the two angles, so we have to map
     // it to the range [0, 1].
-    float angleWithHorizon = glm::dot(ray.direction, vec3(0, 1, 0)) / glm::length(ray.direction);
+    float angleWithHorizon = glm::dot(ray.direction, vec3(0, 0, 1)) / glm::length(ray.direction);
     angleWithHorizon = (-angleWithHorizon + 1) / 2.0;
     return vec3(150, 220, 255) * angleWithHorizon;
 }
@@ -33,13 +48,13 @@ int main() {
     // Setup ray
     Ray ray;
     ray.origin = camera.getPos();
-    ray.direction.z = 1;
+    ray.direction.y = 1;
 
     // Render loop
     for (int i = 0; i < HEIGHT; i++) {
         for (int j = 0; j < WIDTH; j++) {
             // Map pixel coordinates to ray direction
-            ray.direction.y = i / (HEIGHT / 2.0) - 1.0;
+            ray.direction.z = i / (HEIGHT / 2.0) - 1.0;
             ray.direction.x = j / (WIDTH / 2.0) - 1.0;
 
             // Get color for this pixel
