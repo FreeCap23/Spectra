@@ -11,6 +11,8 @@ public:
 
     virtual bool hit(Ray& ray) override;
 
+    vec3 getColor(Ray ray);
+
 public:
     vec3 normal;
     float distance;

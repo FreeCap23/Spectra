@@ -12,10 +12,23 @@ bool Plane::hit(Ray& ray) {
 	    float t = -(glm::dot(normal, ray.origin) + distance) / angleWithPlane;
 	    if (t > 0) {
 	        ray.hits.intersection = ray.origin + ray.direction * t;
-	        ray.color = (normal + (float)1.0 / (float)2.0 * (float)255.0);
+            ray.color = getColor(ray);
             ray.hits.t_min = t;
 	        return true;
 	    }
 	}
     return false;
+}
+
+vec3 Plane::getColor(Ray ray) {
+    // Calculate distance between intersection point and origin
+    // We're only interested in the X and Y distances
+    unsigned int distX = ray.hits.intersection.x;
+    unsigned int distY = ray.hits.intersection.y;
+
+    // Generate a checkerboard pattern
+    if ((distX + distY) % 2 == 0)
+        return vec3(255, 0, 0);
+    else
+        return vec3(255, 110, 110);
 }
