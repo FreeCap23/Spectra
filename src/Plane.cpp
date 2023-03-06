@@ -13,6 +13,7 @@ bool Plane::hit(Ray& ray) {
 	    if (t > 0) {
 	        ray.hits.intersection = ray.origin + ray.direction * t;
 	        ray.color = (normal + (float)1.0 / (float)2.0 * (float)255.0);
+            ray.hits.t_min = t;
 	        return true;
 	    }
 	}

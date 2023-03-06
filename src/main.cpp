@@ -1,6 +1,7 @@
 #include "Camera.h"
 #include "Ray.h"
 #include "Sphere.h"
+#include "Plane.h"
 #include "World.h"
 #include "glm/glm.hpp"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -22,7 +23,7 @@ vec3 getColor(Ray& ray) {
     // This is the formula for the cosine of the two angles, so we have to map
     // it to the range [0, 1].
     float angleWithHorizon = glm::dot(ray.direction, vec3(0, 0, 1)) / glm::length(ray.direction);
-    angleWithHorizon = (-angleWithHorizon + 1) / 2.0;
+    angleWithHorizon = (angleWithHorizon + 1) / 2.0;
     vec3 color = vec3(150, 220, 255) * angleWithHorizon;
 
     float t_min = std::numeric_limits<float>::infinity();
@@ -39,6 +40,9 @@ vec3 getColor(Ray& ray) {
 
 // TODO: Add argument for file name
 int main() {
+    // Flip image vertically
+    stbi_flip_vertically_on_write(1);
+
     // Allocate memory for the data
     // 3 means 3 channels of 8 bits each, so 1 byte each
     // 3 bytes for every pixel in the image
@@ -50,7 +54,8 @@ int main() {
     Camera camera(vec3(0, 0, 0));
 
     // Setup world
-    world.entities.emplace_back(new Sphere(vec3(-0.1, 2, 0), 0.7));
+    world.entities.emplace_back(new Plane(vec3(0, 0, 1), 2.0));
+    world.entities.emplace_back(new Sphere(vec3(-0.1, 2, 0.3), 0.7));
     world.entities.emplace_back(new Sphere(vec3(0.1, 1, 0), 0.2));
 
     // Calculate the size of one pixel
