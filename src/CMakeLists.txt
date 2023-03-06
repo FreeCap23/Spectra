@@ -13,4 +13,4 @@ else ()
 
 endif ()
 
-add_executable(Spectra main.cpp Camera.cpp Sphere.cpp)
+add_executable(Spectra main.cpp Camera.cpp Sphere.cpp Plane.cpp)
