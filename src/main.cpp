@@ -50,7 +50,6 @@ int main() {
     Camera camera(vec3(0, 0, 0));
 
     // Setup world
-    // TODO: Fix having to put these in order
     world.entities.emplace_back(new Sphere(vec3(-0.1, 2, 0), 0.7));
     world.entities.emplace_back(new Sphere(vec3(0.1, 1, 0), 0.2));
 
@@ -80,7 +79,7 @@ int main() {
             // Get color for this pixel by averaging multiple rays
             vec3 color(0, 0, 0);
             for (int s = 0; s < SAMPLES; s++) {
-                ray.direction.z = directionZ + horizontalDistribution(generator);
+                ray.direction.z = directionZ + verticalDistribution(generator);
                 ray.direction.x = directionX + horizontalDistribution(generator);
                 color += getColor(ray) * (float)(1.0/SAMPLES);
             }
