@@ -1,11 +1,12 @@
 #pragma once
 #include "glm/glm.hpp"
-#include "Sphere.h"
+#include "Entity.h"
 #include <vector>
+#include <memory>
 
 using glm::vec3;
 
 struct World {
     vec3 skyColor;
-    std::vector<Sphere> spheres; 
+    std::vector<std::unique_ptr<Entity>> entities; 
 };

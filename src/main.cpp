@@ -8,6 +8,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <random>
+#include <limits>
 
 #define WIDTH 600
 #define HEIGHT 400
@@ -17,22 +18,23 @@
 World world;
 
 vec3 getColor(Ray& ray) {
-    for (Sphere sphere : world.spheres) {
-        if (sphere.hit(ray)) {
-            vec3 intersectionPoint = ray.origin + ray.hits.t_min * ray.direction;
-            vec3 normal = glm::normalize(intersectionPoint - sphere.center);
-
-            // Map to [0, 1] and multiply by 255 to get a color
-            vec3 normalColor = (normal + float(1.0)) / float(2.0) * float(255.0);
-            return normalColor;
-        }
-    }
     // Return sky color if no intersection with any objects is found
     // This is the formula for the cosine of the two angles, so we have to map
     // it to the range [0, 1].
     float angleWithHorizon = glm::dot(ray.direction, vec3(0, 0, 1)) / glm::length(ray.direction);
     angleWithHorizon = (-angleWithHorizon + 1) / 2.0;
-    return vec3(150, 220, 255) * angleWithHorizon;
+    vec3 color = vec3(150, 220, 255) * angleWithHorizon;
+
+    float t_min = std::numeric_limits<float>::infinity();
+    for (std::unique_ptr<Entity> &entity : world.entities) {
+        if (entity->hit(ray)) {
+            if (ray.hits.t_min <= t_min) {
+                t_min = ray.hits.t_min;
+                color = ray.color;
+            }
+        }
+    }
+    return color;
 }
 
 // TODO: Add argument for file name
@@ -49,8 +51,8 @@ int main() {
 
     // Setup world
     // TODO: Fix having to put these in order
-    world.spheres.push_back(Sphere(vec3(0, 1, 0), 0.5));
-    world.spheres.push_back(Sphere(vec3(0, 4, 0), 2.5));
+    world.entities.emplace_back(new Sphere(vec3(-0.1, 2, 0), 0.7));
+    world.entities.emplace_back(new Sphere(vec3(0.1, 1, 0), 0.2));
 
     // Calculate the size of one pixel
     float horizontalSize = 1.0 / (WIDTH);
