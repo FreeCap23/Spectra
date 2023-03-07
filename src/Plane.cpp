@@ -28,7 +28,7 @@ vec3 Plane::getColor(Ray ray) {
 
     // Generate a checkerboard pattern
     if ((distX + distY) % 2 == 0)
-        return vec3(255, 0, 0);
+        return vec3(53, 110, 252);
     else
-        return vec3(255, 110, 110);
+        return vec3(127, 162, 250);
 }
