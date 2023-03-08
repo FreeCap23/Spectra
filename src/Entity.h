@@ -8,5 +8,5 @@ class Entity {
     public:
         Entity() {};
 
-        virtual bool hit(Ray& ray) {};
+        virtual bool hit(Ray&) = 0;
 };
