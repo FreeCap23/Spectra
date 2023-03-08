@@ -10,7 +10,8 @@ bool Sphere::hit(Ray& ray) {
     float a, h, c;
     a = glm::dot(ray.direction, ray.direction);
     h = glm::dot(ray.direction, (ray.origin - center));
-    c = glm::dot((ray.origin - center), (ray.origin - center)) - radius * radius;
+    c = glm::dot((ray.origin - center), (ray.origin - center))
+        - radius * radius;
 
     float determinant = h * h - a * c;
     // We compare to 0.01 to account for errors made by floating point
@@ -23,7 +24,8 @@ bool Sphere::hit(Ray& ray) {
         ray.hits.intersection = ray.origin + ray.hits.t_min * ray.direction;
         ray.hits.normal = glm::normalize(ray.hits.intersection - center);
         // Map to [0, 1] and multiply by 255 to get a color
-        ray.color = (ray.hits.normal + float(1.0)) / float(2.0) * float(255.0);
+        ray.color = (ray.hits.normal + static_cast<float>(1.0))
+            / static_cast<float>(2.0) * static_cast<float>(255.0);
         return true;
     }
     return false;

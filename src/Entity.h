@@ -5,8 +5,8 @@
 using glm::vec3;
 
 class Entity {
-    public:
-        Entity() {};
+ public:
+    Entity() {}
 
-        virtual bool hit(Ray&) = 0;
+    virtual bool hit(Ray&) = 0;
 };

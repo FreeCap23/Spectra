@@ -5,15 +5,15 @@
 using glm::vec3;
 
 class Plane : public Entity {
-public:
+ public:
     Plane();
     Plane(vec3 norm, float dist);
 
-    virtual bool hit(Ray& ray) override;
+    bool hit(Ray& ray) override;
 
     vec3 getColor(Ray ray);
 
-public:
+ public:
     vec3 normal;
     float distance;
 };

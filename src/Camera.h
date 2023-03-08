@@ -4,14 +4,12 @@
 using glm::vec3;
 
 class Camera {
-    public:
-        Camera() {}
-        Camera(vec3 pos) {
-            m_pos = pos;
-        }
+ public:
+    Camera() {}
+    explicit Camera(vec3 pos) : position(pos) {}
 
-        vec3 getPos();
+    vec3 getPos();
 
-    private:
-        vec3 m_pos;
+ private:
+    vec3 position;
 };

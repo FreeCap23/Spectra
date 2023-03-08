@@ -6,13 +6,13 @@
 using glm::vec3;
 
 class Sphere : public Entity{
-    public:
-        Sphere();
-        Sphere(vec3 cen, float rad);
+ public:
+    Sphere();
+    Sphere(vec3 cen, float rad);
 
-        virtual bool hit(Ray& ray) override;
+    bool hit(Ray& ray) override;
 
-    public:
-        vec3 center;
-        float radius;
+ public:
+    vec3 center;
+    float radius;
 };
