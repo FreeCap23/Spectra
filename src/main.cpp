@@ -3,9 +3,8 @@
 #include "Sphere.h"
 #include "Plane.h"
 #include "World.h"
+#include "Spectra.h"
 #include "glm/glm.hpp"
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb_image_write.h"
 #include <cstdio>
 #include <cstdlib>
 #include <random>
@@ -40,9 +39,6 @@ vec3 getColor(Ray& ray) {
 
 // TODO: Add argument for file name
 int main() {
-    // Flip image vertically
-    stbi_flip_vertically_on_write(1);
-
     // Allocate memory for the data
     // 3 means 3 channels of 8 bits each, so 1 byte each
     // 3 bytes for every pixel in the image
@@ -101,10 +97,7 @@ int main() {
         }
     }
 
-    // Write image buffer to file
-    stbi_write_png("out.png", WIDTH, HEIGHT, 3, data, 3 * WIDTH);
-
-    free(data);
+    Spectra::writeImage("out.png", WIDTH, HEIGHT, data);
 
     return 0;
 }
