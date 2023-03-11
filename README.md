@@ -14,7 +14,7 @@ I've been interested in raytracing for some time, so I decided to try to write o
 - [pbrt-v3](pbrt.org)
 
 ## Building
-To build Spectra, you need CMake and a C++ Compiler, such as g++ or msvc.
+To build Spectra, you need CMake 3.2+ and a C++ Compiler, such as g++ or MSVC.
 ```bash
 mkdir build
 cmake -S src -B build
