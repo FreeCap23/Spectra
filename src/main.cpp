@@ -25,15 +25,30 @@ vec3 getColor(Ray& ray) {
         glm::dot(ray.direction, vec3(0, 0, 1))
         / glm::length(ray.direction);
     angleWithHorizon = (angleWithHorizon + 1) / 2.0;
-    vec3 color = vec3(150, 220, 255) * angleWithHorizon;
+    vec3 color = vec3(0.58, 0.86, 1) * angleWithHorizon;
 
     float t_min = std::numeric_limits<float>::infinity();
     for (std::unique_ptr<Entity> &entity : world.entities) {
-        if (entity->hit(ray)) {
-            if (ray.hits.t_min <= t_min) {
-                t_min = ray.hits.t_min;
-                color = ray.color;
+        if (entity->hit(ray) && ray.hits.t_min <= t_min) {
+            t_min = ray.hits.t_min;
+            // TODO: See if the ray is intersected and don't add
+            // the light if yes.
+            color = ray.color;
+            float brightnessAtPoint = 0;
+            vec3 lightsColor(0, 0, 0);
+            for (std::unique_ptr<Light> &light : world.lights) {
+                // Calculate angle between the normal and the light
+                vec3 vectorToLight = ray.hits.intersection - light->position;
+                float angle = glm::dot(ray.hits.normal, vectorToLight);
+                angle = (-angle + 1) / 2.0;
+                // Get the distance to the light
+                float distToLight = glm::abs(glm::length(vectorToLight));
+                // Calculate brightness at the intersection point
+                brightnessAtPoint += (light->brightness * (1.0 / (distToLight * distToLight))) * angle;
+                // Add the light's color to the ray color
+                lightsColor += brightnessAtPoint * light->color;
             }
+            color *= lightsColor;
         }
     }
     return color;
@@ -54,6 +69,11 @@ int main() {
     world.entities.emplace_back(new Plane(vec3(0, 0, 1), 2.0));
     world.entities.emplace_back(new Sphere(vec3(-0.1, 2, 0.3), 0.7));
     world.entities.emplace_back(new Sphere(vec3(0.1, 1, 0), 0.2));
+    // Setup Light properties
+    vec3 lightColor(0.39, 0.39, 0.39);
+    vec3 lightPos(-1.5, 1, 1);
+    float lightBright = 2.8;
+    world.lights.emplace_back(new Light(lightPos, lightColor, lightBright));
 
     // Calculate the size of one pixel
     float horizontalSize = 1.0 / (WIDTH);
@@ -95,10 +115,24 @@ int main() {
             vec3 color = getColor(ray);
             #endif
 
+            // This is pretty stupid but it works
+            if (color.x > 1)
+                color.x = 1;
+            if (color.y > 1)
+                color.y = 1;
+            if (color.z > 1)
+                color.z = 1;
+            if (color.x < 0)
+                color.x = 0;
+            if (color.y < 0)
+                color.y = 0;
+            if (color.z < 0)
+                color.z = 0;
+
             // Write the color to the image buffer
-            data[offset++] = static_cast<uint8_t>(color.x);
-            data[offset++] = static_cast<uint8_t>(color.y);
-            data[offset++] = static_cast<uint8_t>(color.z);
+            data[offset++] = static_cast<uint8_t>(color.x * 255.0);
+            data[offset++] = static_cast<uint8_t>(color.y * 255.0);
+            data[offset++] = static_cast<uint8_t>(color.z * 255.0);
         }
     }
 

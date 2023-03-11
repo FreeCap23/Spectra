@@ -26,6 +26,7 @@ bool Sphere::hit(Ray& ray) {
         // Map to [0, 1] and multiply by 255 to get a color
         ray.color = (ray.hits.normal + static_cast<float>(1.0))
             / static_cast<float>(2.0) * static_cast<float>(255.0);
+        ray.color = vec3(1, 0, 0);
         return true;
     }
     return false;
