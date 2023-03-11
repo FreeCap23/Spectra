@@ -5,6 +5,10 @@ This is the most recent image rendered.
 
 ![Image rendered with Spectra](out.png)
 
+## Features
+- Stochastic Multi-Sampling anti-aliasing
+- Lights
+
 ## Motivation
 I've been interested in raytracing for some time, so I decided to try to write one myself.
 
