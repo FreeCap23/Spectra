@@ -71,8 +71,8 @@ int main() {
     world.entities.emplace_back(new Sphere(vec3(0.1, 1, 0), 0.2));
     // Setup Light properties
     vec3 lightColor(0.39, 0.39, 0.39);
-    vec3 lightPos(-1.5, 1, 1);
-    float lightBright = 2.8;
+    vec3 lightPos(-1.5, 1.4, 0.5);
+    float lightBright = 5.8;
     world.lights.emplace_back(new Light(lightPos, lightColor, lightBright));
 
     // Calculate the size of one pixel
