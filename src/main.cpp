@@ -5,6 +5,7 @@
 #include "Scene.h"
 #include "Spectra.h"
 #include "Camera.h"
+#include "Material.h"
 
 struct options {
     bool multisample;
@@ -21,9 +22,11 @@ dvec3 getRayColor(Ray ray, Scene scene, int depth) {
 
     hitRecord hits;
     if (scene.hit(ray, 0.001, infinity, hits)) {
-        dvec3 target = hits.intersection + hits.normal + Spectra::randomInUnitSphere();
-        Ray recurseRay(hits.intersection, target - hits.intersection);
-        return 0.5 * getRayColor(recurseRay, scene, depth - 1);
+        Ray scattered;
+        dvec3 attenuation;
+        if (hits.mat_ptr->scatter(ray, hits, attenuation, scattered))
+            return attenuation * getRayColor(scattered, scene, depth - 1);
+        return dvec3(0);
     }
 
     double angleWithHorizon =
@@ -49,16 +52,22 @@ int main() {
     opts.width = 600;
     opts.height = 400;
     opts.multisample = true;
-    opts.samples = 16;
-    opts.maxDepth = 10;
+    opts.samples = 50;
+    opts.maxDepth = 50;
     const double aspectRatio = static_cast<double>(opts.width) / opts.height;
 
     /*
      * Initialize scene
      */
+    auto materialGround = std::make_shared<Lambertian>(dvec3(0.8, 0.8, 0.8));
+    auto materialCenter = std::make_shared<Lambertian>(dvec3(0.7, 0.3, 0.3));
+    auto materialLeft = std::make_shared<Metal>(dvec3(0.8, 0.8, 0.8));
+    auto materialRight = std::make_shared<Metal>(dvec3(0.8, 0.6, 0.2));
     Scene scene;
-    scene.add(std::make_shared<Sphere>(dvec3(0, 1, 0), 0.5));
-    scene.add(std::make_shared<Sphere>(dvec3(0, 1, -101.5), 100.5));
+    scene.add(std::make_shared<Sphere>(dvec3(0, 1, 0), 0.5, materialCenter));
+    scene.add(std::make_shared<Sphere>(dvec3(0, 1, -101.5), 100.5, materialGround));
+    scene.add(std::make_shared<Sphere>(dvec3(1, 1, 0), 0.5, materialRight));
+    scene.add(std::make_shared<Sphere>(dvec3(-1, 1, 0), 0.5, materialLeft));
 
     Camera camera(aspectRatio, dvec3(0));
 

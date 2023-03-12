@@ -1,11 +1,15 @@
 #pragma once
+#include <memory>
 #include "glm/glm.hpp"
 #include "Ray.h"
 
 using glm::vec3;
 
+class Material;
+
 struct hitRecord {
     dvec3 intersection, normal;
+    std::shared_ptr<Material> mat_ptr;
     double t;
     bool frontFace;
 

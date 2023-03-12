@@ -23,3 +23,12 @@ dvec3 Spectra::randomInUnitSphere() {
         return glm::normalize(p);
     }
 }
+
+bool Spectra::nearZero(dvec3 vec) {
+    const double limit = 1e-8;
+    return (fabs(vec.x) < limit && fabs(vec.y) < limit && fabs(vec.z) < limit);
+}
+
+dvec3 Spectra::reflect(dvec3 vec, dvec3 normal) {
+    return vec - 2 * glm::dot(vec, normal) * normal;
+}

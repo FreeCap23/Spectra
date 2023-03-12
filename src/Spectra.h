@@ -32,6 +32,10 @@ namespace Spectra {
     inline static dvec3 randomVec(double min, double max) {
         return dvec3(randomDouble(min, max), randomDouble(min, max), randomDouble(min, max));
     }
+
+    bool nearZero(dvec3 vec);
+
+    dvec3 reflect(dvec3 vec, dvec3 normal);
     /**
      * Will return a random dvec3 inside a sphere of radius 1
     */
