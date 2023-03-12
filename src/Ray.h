@@ -1,18 +1,16 @@
 #pragma once
-
 #include "glm/glm.hpp"
 
-using glm::vec3;
+using glm::dvec3;
 
-struct Hits {
-    float t_min;
-    vec3 normal;
-    vec3 intersection;
-};
+class Ray {
+ public:
+    Ray() {}
+    Ray(dvec3 orig, dvec3 dir) : origin(orig), direction(dir) {}
+    dvec3 getOrigin() const { return origin; }
+    dvec3 getDirection() const { return direction; }
+    dvec3 at(double t) { return origin + t * direction; }
 
-struct Ray {
-    vec3 color;
-    vec3 origin;
-    vec3 direction;
-    Hits hits;
+ private:
+    dvec3 origin, direction;
 };

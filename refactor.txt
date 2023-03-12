@@ -1,0 +1,22 @@
+main function:
+    scene.render()
+
+scene class:
+    initialize objects
+    initialize camera
+        -fov
+        -resolution
+        -position
+        -rotation matrix
+    initialize pixel buffer using camera resolution info
+    pixel_color = trace()
+    map pixel_color to 0-255 range
+    write pixel_color to pixel buffer
+    write pixel buffer to file with stb_image
+
+trace function:
+    should be able to call itself for reflection, transmission
+    will not modify the ray it's tracing
+    will loop through objects to find intersections by itself
+    will select the closest object and only apply the color then
+    will return values between 0 and 1

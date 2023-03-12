@@ -1,18 +1,21 @@
 #pragma once
+#include <algorithm>
 #include "glm/glm.hpp"
 #include "Ray.h"
 #include "Entity.h"
 
-using glm::vec3;
+using glm::dvec3;
 
 class Sphere : public Entity{
  public:
-    Sphere();
-    Sphere(vec3 cen, float rad);
+    Sphere() {};
+    Sphere(dvec3 cen, double rad) : center(cen), radius(rad) {};
+    dvec3 getCenter() const { return center; }
+    double getRadius() const { return radius; }
 
-    bool hit(Ray& ray) override;
+    virtual bool hit(Ray& ray, double t_min, double t_max, hitRecord& hits) const override;
 
- public:
-    vec3 center;
-    float radius;
+ private:
+    dvec3 center;
+    double radius;
 };
