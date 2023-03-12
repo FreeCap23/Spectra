@@ -7,7 +7,7 @@ This is the most recent image rendered.
 
 ## Features
 - Stochastic Multi-Sampling anti-aliasing
-- Lights
+- Materials
 
 ## Motivation
 I've been interested in raytracing for some time, so I decided to try to write one myself.
@@ -16,6 +16,7 @@ I've been interested in raytracing for some time, so I decided to try to write o
 - ["An Introduction to Ray Tracing" by Andrew S. Glassner](https://www.realtimerendering.com/raytracing/An-Introduction-to-Ray-Tracing-The-Morgan-Kaufmann-Series-in-Computer-Graphics-.pdf)
 - [scratchapixel.com](https://www.scratchapixel.com)
 - [pbrt-v3](https://www.pbrt.org)
+- [Ray Tracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html)
 
 ## Building
 To build Spectra, you need CMake 3.2+ and a C++ Compiler, such as g++ or MSVC.
