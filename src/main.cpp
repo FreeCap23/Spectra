@@ -72,7 +72,7 @@ int main() {
                 Ray ray = camera.getRay(u, v);
                 color += getRayColor(ray, scene);
             }
-            color = color / static_cast<double>(opts.samples);
+            color = glm::sqrt(color / static_cast<double>(opts.samples));
             data[offset++] = static_cast<int>(clamp(color.x, 0, 1) * 255);
             data[offset++] = static_cast<int>(clamp(color.y, 0, 1) * 255);
             data[offset++] = static_cast<int>(clamp(color.z, 0, 1) * 255);
