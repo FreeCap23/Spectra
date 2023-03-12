@@ -14,8 +14,8 @@ I've been interested in raytracing for some time, so I decided to try to write o
 
 ## Resources I used
 - ["An Introduction to Ray Tracing" by Andrew S. Glassner](https://www.realtimerendering.com/raytracing/An-Introduction-to-Ray-Tracing-The-Morgan-Kaufmann-Series-in-Computer-Graphics-.pdf)
-- [scratchapixel.com](scratchapixel.com)
-- [pbrt-v3](pbrt.org)
+- [scratchapixel.com](https://www.scratchapixel.com)
+- [pbrt-v3](https://www.pbrt.org)
 
 ## Building
 To build Spectra, you need CMake 3.2+ and a C++ Compiler, such as g++ or MSVC.
