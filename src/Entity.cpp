@@ -1,4 +1,4 @@
-#include "Sphere.h"
+#include "Entity.h"
 
 bool Sphere::hit(Ray& ray, double t_min, double t_max, hitRecord& hits) const {
     // h = b/2

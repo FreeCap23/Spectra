@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include "Spectra.h"
 #include "Ray.h"
-#include "Sphere.h"
 #include "Scene.h"
 #include "Spectra.h"
 #include "Camera.h"
 #include "Material.h"
+#include "Entity.h"
 
 struct options {
     bool multisample;
