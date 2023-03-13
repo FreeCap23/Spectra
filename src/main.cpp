@@ -61,8 +61,8 @@ int main() {
      */
     auto materialGround = std::make_shared<Lambertian>(dvec3(0.8, 0.8, 0.8));
     auto materialCenter = std::make_shared<Lambertian>(dvec3(0.7, 0.3, 0.3));
-    auto materialLeft = std::make_shared<Metal>(dvec3(0.8, 0.8, 0.8));
-    auto materialRight = std::make_shared<Metal>(dvec3(0.8, 0.6, 0.2));
+    auto materialLeft = std::make_shared<Metal>(dvec3(0.8, 0.8, 0.8), 0.1);
+    auto materialRight = std::make_shared<Metal>(dvec3(0.8, 0.6, 0.2), 0.8);
     Scene scene;
     scene.add(std::make_shared<Sphere>(dvec3(0, 1, 0), 0.5, materialCenter));
     scene.add(std::make_shared<Sphere>(dvec3(0, 1, -101.5), 100.5, materialGround));

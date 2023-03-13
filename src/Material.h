@@ -40,7 +40,8 @@ class Lambertian : public Material {
 
 class Metal : public Material {
  public:
-    Metal(dvec3 albedo) : m_albedo(albedo) {}
+    Metal(dvec3 albedo, double roughness) :
+        m_albedo(albedo), m_roughness(roughness) {}
     virtual bool scatter(
         Ray ray,
         hitRecord hits,
@@ -48,11 +49,16 @@ class Metal : public Material {
         Ray& scattered)
     const override {
         dvec3 reflected = Spectra::reflect(glm::normalize(ray.getDirection()), hits.normal);
-        scattered = Ray(hits.intersection, reflected);
+        dvec3 roughReflected =
+            reflected
+            + m_roughness
+            * Spectra::randomInUnitSphere();
+        scattered = Ray(hits.intersection, roughReflected);
         attenuation = m_albedo;
         return glm::dot(reflected, hits.normal) > 0;
     }
 
  private:
     dvec3 m_albedo;
+    double m_roughness;
 };
