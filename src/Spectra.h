@@ -36,6 +36,7 @@ namespace Spectra {
     bool nearZero(dvec3 vec);
 
     dvec3 reflect(dvec3 vec, dvec3 normal);
+    dvec3 refract(dvec3 vec, dvec3 normal, double refractionRatio);
     /**
      * Will return a random dvec3 inside a sphere of radius 1
     */

@@ -59,15 +59,32 @@ int main() {
     /*
      * Initialize scene
      */
-    auto materialGround = std::make_shared<Lambertian>(dvec3(0.8, 0.8, 0.8));
-    auto materialCenter = std::make_shared<Lambertian>(dvec3(0.7, 0.3, 0.3));
-    auto materialLeft = std::make_shared<Metal>(dvec3(0.8, 0.8, 0.8), 0.1);
-    auto materialRight = std::make_shared<Metal>(dvec3(0.8, 0.6, 0.2), 0.8);
+    // Ground
+    auto matGround = std::make_shared<Lambertian>(dvec3(0.2, 0.8, 0.5));
+    dvec3 posGround(0, 1, -101.5);
+    double radGround = 100.5;
+    // Lower left corner
+    auto matLLC = std::make_shared<Dielectric>(1.6);
+    dvec3 posLLC(-0.5, 0.5, -0.5);
+    double radLLC = 0.5;
+    // Upper left corner
+    auto matULC = std::make_shared<Metal>(dvec3(0.7, 0.7, 0.7), 0.7);
+    dvec3 posULC(-0.5, 0.5, 0.5);
+    double radULC = 0.5;
+    // Lower right corner
+    auto matLRC = std::make_shared<Lambertian>(dvec3(0.6, 0.01, 0.6));
+    dvec3 posLRC(0.5, 0.5, -0.5);
+    double radLRC = 0.5;
+    // Upper right corner
+    auto matURC = std::make_shared<Metal>(dvec3(0.1, 0.3, 0.6), 0.1);
+    dvec3 posURC(0.5, 0.5, 0.5);
+    double radURC = 0.5;
     Scene scene;
-    scene.add(std::make_shared<Sphere>(dvec3(0, 1, 0), 0.5, materialCenter));
-    scene.add(std::make_shared<Sphere>(dvec3(0, 1, -101.5), 100.5, materialGround));
-    scene.add(std::make_shared<Sphere>(dvec3(1, 1, 0), 0.5, materialRight));
-    scene.add(std::make_shared<Sphere>(dvec3(-1, 1, 0), 0.5, materialLeft));
+    scene.add(std::make_shared<Sphere>(posGround, radGround, matGround));
+    scene.add(std::make_shared<Sphere>(posLLC, radLLC, matLLC));
+    scene.add(std::make_shared<Sphere>(posULC, radULC, matULC));
+    scene.add(std::make_shared<Sphere>(posLRC, radLRC, matLRC));
+    scene.add(std::make_shared<Sphere>(posURC, radURC, matURC));
 
     Camera camera(aspectRatio, dvec3(0));
 
