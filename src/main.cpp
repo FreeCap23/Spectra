@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <iostream>
 #include "Spectra.h"
 #include "Ray.h"
 #include "Scene.h"
@@ -49,42 +50,43 @@ int main() {
      * Render options
      */
     options opts;
-    opts.width = 600;
-    opts.height = 400;
-    opts.multisample = true;
-    opts.samples = 30;
-    opts.maxDepth = 50;
+    opts.width = 2560;
+    opts.height = 1600;
+    opts.samples = 500;
+    opts.maxDepth = 100;
     const double aspectRatio = static_cast<double>(opts.width) / opts.height;
 
     /*
      * Initialize scene
      */
-    // Ground
     auto matGround = std::make_shared<Lambertian>(dvec3(0.2, 0.8, 0.5));
-    // Lower left corner
-    auto matLLC = std::make_shared<Dielectric>(1.6);
-    dvec3 posLLC(-0.5, 0.5, -0.5);
-    double radLLC = 0.5;
-    // Upper left corner
-    auto matULC = std::make_shared<Metal>(dvec3(0.7, 0.7, 0.7), 0.7);
-    dvec3 posULC(-0.5, 0.5, 0.5);
-    double radULC = 0.5;
-    // Lower right corner
-    auto matLRC = std::make_shared<Lambertian>(dvec3(0.6, 0.01, 0.6));
-    dvec3 posLRC(0.5, 0.5, -0.5);
-    double radLRC = 0.5;
-    // Upper right corner
-    auto matURC = std::make_shared<Metal>(dvec3(0.1, 0.3, 0.6), 0.1);
-    dvec3 posURC(0.5, 0.5, 0.5);
-    double radURC = 0.5;
-    Scene scene;
-    scene.add(std::make_shared<Plane>(dvec3(0, 0, 1), 1, matGround));
-    scene.add(std::make_shared<Sphere>(posLLC, radLLC, matLLC));
-    scene.add(std::make_shared<Sphere>(posULC, radULC, matULC));
-    scene.add(std::make_shared<Sphere>(posLRC, radLRC, matLRC));
-    scene.add(std::make_shared<Sphere>(posURC, radURC, matURC));
+    auto matMirror = std::make_shared<Metal>(dvec3(1, 1, 1), 0.02);
 
-    Camera camera(12, aspectRatio, dvec3(0, -10, 0), dvec3(0, 1, 0), dvec3(0, 0, 1));
+    Scene scene;
+    scene.add(std::make_shared<Plane>(dvec3(0, 0, 1), 0, matGround));
+    scene.add(std::make_shared<Plane>(dvec3(0, -1, 0), 3, matMirror));
+
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 8; j++) {
+            double picker = Spectra::randomDouble();
+            std::shared_ptr<Material> mat;
+            if (picker < 0.33) {
+                dvec3 color = Spectra::randomVec();
+                mat = std::make_shared<Lambertian>(color);
+            } else if (picker < 0.66) {
+                dvec3 color = Spectra::randomVec();
+                double roughness = Spectra::randomDouble();
+                mat = std::make_shared<Metal>(color, roughness);
+            } else {
+                double ior = Spectra::randomDouble();
+                mat = std::make_shared<Dielectric>(ior);
+            }
+            dvec3 position((j-3.5) * 1.25, (i-1.5) * 1.25, 0.5);
+            scene.add(std::make_shared<Sphere>(position, 0.5, mat));
+        }
+    }
+
+    Camera camera(8, aspectRatio, dvec3(0, -50, 35), dvec3(0, 0, 2), dvec3(0, 0, 1));
 
     /*
      * Initialize output file  
@@ -95,8 +97,9 @@ int main() {
     /*
      * Render loop
      */
-    printf("Starting render...\n");
+    printf("Starting render...");
     for (int i = 0; i < opts.height; i++) {
+        std::cerr << "\r" << opts.height - i << " lines remaining.";
         for (int j = 0; j < opts.width; j++) {
             dvec3 color(0);
             for (int s = 0; s < opts.samples; s++) {
@@ -113,6 +116,6 @@ int main() {
         }
     }
     Spectra::writeImage("../out.png", opts.width, opts.height, data);
-    printf("Done rendering.\n");
+    printf("\r\n");
     return 0;
 }
