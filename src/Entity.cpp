@@ -29,3 +29,18 @@ bool Sphere::hit(Ray& ray, double t_min, double t_max, hitRecord& hits) const {
         return true;
     }
 }
+
+bool Plane::hit(Ray& ray, double t_min, double t_max, hitRecord& hits) const {
+    dvec3 normal = m_normal;
+    double angleWithPlane = glm::dot(normal, ray.getDirection());
+    if (angleWithPlane == 0)
+        return false;
+    double t = -(glm::dot(normal, ray.getOrigin()) + m_distanceToOrigin) / angleWithPlane;
+    if (t < t_min || t > t_max)
+        return false;
+    hits.intersection = ray.at(t);
+    hits.t = t;
+    hits.setFaceNormal(ray, normal);
+    hits.mat_ptr = m_mat_ptr;
+    return true;
+}

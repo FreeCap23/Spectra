@@ -27,7 +27,7 @@ class Entity {
     virtual bool hit(Ray& ray, double t_min, double t_max, hitRecord& hits) const = 0;
 };
 
-class Sphere : public Entity{
+class Sphere : public Entity {
  public:
     Sphere() {};
     Sphere(dvec3 center, double radius, std::shared_ptr<Material> mat_ptr) :
@@ -43,4 +43,19 @@ class Sphere : public Entity{
     dvec3 m_center;
     std::shared_ptr<Material> m_mat_ptr;
     double m_radius;
+};
+
+class Plane : public Entity {
+ public:
+    Plane() {};
+    Plane(dvec3 normal, double distanceToOrigin, std::shared_ptr<Material> mat_ptr) :
+        m_normal(normal),
+        m_distanceToOrigin(distanceToOrigin),
+        m_mat_ptr(mat_ptr) {}
+    virtual bool hit(Ray& ray, double t_min, double t_max, hitRecord& hits) const override;
+
+ private:
+    dvec3 m_normal;
+    double m_distanceToOrigin;
+    std::shared_ptr<Material> m_mat_ptr;
 };

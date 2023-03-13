@@ -49,10 +49,10 @@ int main() {
      * Render options
      */
     options opts;
-    opts.width = 2560;
-    opts.height = 1600;
+    opts.width = 600;
+    opts.height = 400;
     opts.multisample = true;
-    opts.samples = 100;
+    opts.samples = 30;
     opts.maxDepth = 50;
     const double aspectRatio = static_cast<double>(opts.width) / opts.height;
 
@@ -61,8 +61,6 @@ int main() {
      */
     // Ground
     auto matGround = std::make_shared<Lambertian>(dvec3(0.2, 0.8, 0.5));
-    dvec3 posGround(0, 1, -101.5);
-    double radGround = 100.5;
     // Lower left corner
     auto matLLC = std::make_shared<Dielectric>(1.6);
     dvec3 posLLC(-0.5, 0.5, -0.5);
@@ -80,7 +78,7 @@ int main() {
     dvec3 posURC(0.5, 0.5, 0.5);
     double radURC = 0.5;
     Scene scene;
-    scene.add(std::make_shared<Sphere>(posGround, radGround, matGround));
+    scene.add(std::make_shared<Plane>(dvec3(0, 0, 1), 1, matGround));
     scene.add(std::make_shared<Sphere>(posLLC, radLLC, matLLC));
     scene.add(std::make_shared<Sphere>(posULC, radULC, matULC));
     scene.add(std::make_shared<Sphere>(posLRC, radLRC, matLRC));
