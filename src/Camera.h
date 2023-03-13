@@ -6,7 +6,12 @@ using glm::dvec3;
 
 class Camera {
  public:
-    Camera(double aspectRatio, dvec3 origin);
+    Camera(
+      double fov,
+      double aspectRatio,
+      dvec3 origin,
+      dvec3 lookAt,
+      dvec3 vectUp);
     Ray getRay(double u, double v) const;
 
  private:

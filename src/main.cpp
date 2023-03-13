@@ -86,7 +86,7 @@ int main() {
     scene.add(std::make_shared<Sphere>(posLRC, radLRC, matLRC));
     scene.add(std::make_shared<Sphere>(posURC, radURC, matURC));
 
-    Camera camera(aspectRatio, dvec3(0));
+    Camera camera(12, aspectRatio, dvec3(0, -10, 0), dvec3(0, 1, 0), dvec3(0, 0, 1));
 
     /*
      * Initialize output file  
