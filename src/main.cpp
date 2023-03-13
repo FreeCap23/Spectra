@@ -49,10 +49,10 @@ int main() {
      * Render options
      */
     options opts;
-    opts.width = 600;
-    opts.height = 400;
+    opts.width = 2560;
+    opts.height = 1600;
     opts.multisample = true;
-    opts.samples = 50;
+    opts.samples = 100;
     opts.maxDepth = 50;
     const double aspectRatio = static_cast<double>(opts.width) / opts.height;
 
