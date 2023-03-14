@@ -9,6 +9,32 @@ static void glfw_error_callback(int error, const char* description)
     fprintf(stderr, "GLFW Error %d: %s\n", error, description);
 }
 
+// Simple helper function to load an image into a OpenGL texture with common settings
+bool LoadTextureFromData(const uint8_t* data, GLuint* out_texture, int image_width, int image_height) {
+    if (data == NULL)
+        return false;
+
+    // Create a OpenGL texture identifier
+    GLuint image_texture;
+    glGenTextures(1, &image_texture);
+    glBindTexture(GL_TEXTURE_2D, image_texture);
+
+    // Setup filtering parameters for display
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP); // This is required on WebGL for non power-of-two textures
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP); // Same
+
+    // Upload pixels into texture
+#if defined(GL_UNPACK_ROW_LENGTH) && !defined(__EMSCRIPTEN__)
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+#endif
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image_width, image_height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+
+    *out_texture = image_texture;
+    return true;
+}
+
 int main() {
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
@@ -63,14 +89,25 @@ int main() {
 
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
+    options renderOpts;
+    renderOpts.samples = 50;
+    renderOpts.maxDepth = 50;
+    int renderScale = 100;
+    ImVec2 viewport(800, 600);
+    int samplesDone = 0;
+    int samples = 0;
+    bool shouldRender = false;
+    bool renderedAtLeastOnce = false;
+    
+    Renderer renderer;
+    uint8_t* data = new uint8_t[10];
+
     // Main loop
     while (!glfwWindowShouldClose(window))
     {
-        // Poll and handle events (inputs, window resize, etc.)
-        // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
-        // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application, or clear/overwrite your copy of the mouse data.
-        // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application, or clear/overwrite your copy of the keyboard data.
-        // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
+        renderOpts.height = (renderScale / 100.0) * viewport.y;
+        renderOpts.width = (renderScale / 100.0) * viewport.x;
+
         glfwPollEvents();
 
         // Start the Dear ImGui frame
@@ -78,44 +115,42 @@ int main() {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
         {
-            static float f = 0.0f;
-            static int counter = 0;
-
-            ImGui::Begin("Hello 2");                          // Create a window called "Hello, world!" and append into it.
-
-            ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-            ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-            if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-                counter++;
-            ImGui::SameLine();
-            ImGui::Text("counter = %d", counter);
-
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+            ImGui::Begin("Render result");
+            viewport = ImGui::GetContentRegionAvail();
+            if (renderedAtLeastOnce) {
+                GLuint imageTexture = 0;
+                LoadTextureFromData(data, &imageTexture, renderOpts.width, renderOpts.height);
+                ImGui::Image((void*)(intptr_t)imageTexture, viewport);
+            }
             ImGui::End();
         }
         {
-            static float f = 0.0f;
-            static int counter = 0;
+            ImGui::Begin("Render options");
 
-            ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-
-            ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-            ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-            if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-                counter++;
+            ImGui::SliderInt("Render scale", &renderScale, 1, 100, "%d%%");
+            ImGui::Text("%dx%d", renderOpts.width, renderOpts.height);
+            ImGui::InputInt("Samples", &renderOpts.samples, 5, 100, 0);
+            ImGui::InputInt("Max Depth", &renderOpts.maxDepth, 5, 100, 0);
+            if (ImGui::Button("Render", ImVec2(100, 25))) {
+                shouldRender = true;
+                samples = renderOpts.samples;
+                free(data);
+                data = new uint8_t[3 * renderOpts.width * renderOpts.height];
+                renderer.Initialize(renderOpts, data);
+            }
             ImGui::SameLine();
-            ImGui::Text("counter = %d", counter);
+            if (ImGui::Button("Export", ImVec2(100, 25))) {
 
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+            }
+            if (renderedAtLeastOnce)
+                ImGui::Text("%d / %d samples finished.", samplesDone, samples);
             ImGui::End();
+        }
+        if (shouldRender && samplesDone < samples) {
+            samplesDone++;
+            renderer.Render(data);
+            renderedAtLeastOnce = true;
         }
 
         // Rendering
