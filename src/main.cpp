@@ -143,6 +143,7 @@ int main() {
                 renderOpts.width = tempResWidth;
                 data = new uint8_t[3 * renderOpts.width * renderOpts.height];
                 samplesDone = 0;
+                memset(data, 0, 3 * renderOpts.width * renderOpts.height);
                 renderer.Initialize(renderOpts, data);
             }
             ImGui::SameLine();

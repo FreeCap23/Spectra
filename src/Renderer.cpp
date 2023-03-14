@@ -64,20 +64,7 @@ void Renderer::Initialize(options opts, uint8_t* data) {
             m_scene.add(std::make_shared<Sphere>(position, 0.5, mat));
         }
     }
-
     m_camera = Camera(8, aspectRatio, dvec3(0, -50, 35), dvec3(0, 0, 2), dvec3(0, 0, 1));
-
-    /*
-     * Initialize output file  
-     */
-    int offset = 0;
-    for (int i = 0; i < opts.height; i++) {
-        for (int j = 0; j < opts.width; j++) {
-            data[offset++] = static_cast<int>(0);
-            data[offset++] = static_cast<int>(0);
-            data[offset++] = static_cast<int>(0);
-        }
-    }
 }
 
 void Renderer::Render(uint8_t* data) {
