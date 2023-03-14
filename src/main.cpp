@@ -92,6 +92,9 @@ int main() {
     options renderOpts;
     renderOpts.samples = 50;
     renderOpts.maxDepth = 50;
+    // Need to define these before using them
+    renderOpts.height = 1;
+    renderOpts.width = 1;
     int renderScale = 100;
     ImVec2 viewport(800, 600);
     int samplesDone = 0;
@@ -105,9 +108,6 @@ int main() {
     // Main loop
     while (!glfwWindowShouldClose(window))
     {
-        renderOpts.height = (renderScale / 100.0) * viewport.y;
-        renderOpts.width = (renderScale / 100.0) * viewport.x;
-
         glfwPollEvents();
 
         // Start the Dear ImGui frame
@@ -128,15 +128,21 @@ int main() {
         {
             ImGui::Begin("Render options");
 
+            // Temporary values for the render resolution
+            int tempResWidth, tempResHeight;
+            tempResHeight = (renderScale / 100.0) * viewport.y;
+            tempResWidth = (renderScale / 100.0) * viewport.x;
             ImGui::SliderInt("Render scale", &renderScale, 1, 100, "%d%%");
-            ImGui::Text("%dx%d", renderOpts.width, renderOpts.height);
+            ImGui::Text("%dx%d", tempResWidth, tempResHeight);
             ImGui::InputInt("Samples", &renderOpts.samples, 5, 100, 0);
             ImGui::InputInt("Max Depth", &renderOpts.maxDepth, 5, 100, 0);
             if (ImGui::Button("Render", ImVec2(100, 25))) {
                 shouldRender = true;
                 samples = renderOpts.samples;
-                free(data);
+                renderOpts.height = tempResHeight;
+                renderOpts.width = tempResWidth;
                 data = new uint8_t[3 * renderOpts.width * renderOpts.height];
+                samplesDone = 0;
                 renderer.Initialize(renderOpts, data);
             }
             ImGui::SameLine();
