@@ -20,6 +20,7 @@ I've been interested in raytracing for some time, so I decided to try to write o
 
 ## Building
 To build Spectra, you need CMake 3.2+ and a C++ Compiler, such as g++ or MSVC.
+Also, make sure to clone recursively.
 ```bash
 mkdir build
 cmake -S src -B build

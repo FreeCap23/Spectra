@@ -1,121 +1,142 @@
-#include <stdio.h>
-#include <iostream>
-#include "Spectra.h"
-#include "Ray.h"
-#include "Scene.h"
-#include "Spectra.h"
-#include "Camera.h"
-#include "Material.h"
-#include "Entity.h"
+#include "Renderer.h"
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
+#include "GLFW/glfw3.h"
 
-struct options {
-    bool multisample;
-    int samples;
-    int maxDepth;
-    int width;
-    int height;
-};
-
-dvec3 getRayColor(Ray ray, Scene scene, int depth) {
-    if (depth <= 0) {
-        return dvec3(0);
-    }
-
-    hitRecord hits;
-    if (scene.hit(ray, 0.001, infinity, hits)) {
-        Ray scattered;
-        dvec3 attenuation;
-        if (hits.mat_ptr->scatter(ray, hits, attenuation, scattered))
-            return attenuation * getRayColor(scattered, scene, depth - 1);
-        return dvec3(0);
-    }
-
-    double angleWithHorizon =
-        glm::dot(ray.getDirection(), dvec3(0, 0, 1))
-        / glm::length(ray.getDirection());
-    angleWithHorizon = (angleWithHorizon + 1) / 2.0;
-    return (1.0-angleWithHorizon)*dvec3(1.0, 1.0, 1.0) + angleWithHorizon*dvec3(0.5, 0.7, 1.0);
-}
-
-double clamp(double value, double min, double max) {
-    if (value < min)
-        return min;
-    if (value > max)
-        return max;
-    return value;
+static void glfw_error_callback(int error, const char* description)
+{
+    fprintf(stderr, "GLFW Error %d: %s\n", error, description);
 }
 
 int main() {
-    /*
-     * Render options
-     */
-    options opts;
-    opts.width = 2560;
-    opts.height = 1600;
-    opts.samples = 500;
-    opts.maxDepth = 100;
-    const double aspectRatio = static_cast<double>(opts.width) / opts.height;
+    glfwSetErrorCallback(glfw_error_callback);
+    if (!glfwInit())
+        return 1;
 
-    /*
-     * Initialize scene
-     */
-    auto matGround = std::make_shared<Lambertian>(dvec3(0.2, 0.8, 0.5));
-    auto matMirror = std::make_shared<Metal>(dvec3(1, 1, 1), 0.02);
+    // Decide GL+GLSL versions
+#if defined(IMGUI_IMPL_OPENGL_ES2)
+    // GL ES 2.0 + GLSL 100
+    const char* glsl_version = "#version 100";
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
+#elif defined(__APPLE__)
+    // GL 3.2 + GLSL 150
+    const char* glsl_version = "#version 150";
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // Required on Mac
+#else
+    // GL 3.0 + GLSL 130
+    const char* glsl_version = "#version 130";
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
+    //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
+#endif
 
-    Scene scene;
-    scene.add(std::make_shared<Plane>(dvec3(0, 0, 1), 0, matGround));
-    scene.add(std::make_shared<Plane>(dvec3(0, -1, 0), 3, matMirror));
+    // Create window with graphics context
+    GLFWwindow* window = glfwCreateWindow(1280, 720, "Spectra", NULL, NULL);
+    if (window == NULL)
+        return 1;
+    glfwMakeContextCurrent(window);
+    glfwSwapInterval(1); // Enable vsync
 
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 8; j++) {
-            double picker = Spectra::randomDouble();
-            std::shared_ptr<Material> mat;
-            if (picker < 0.33) {
-                dvec3 color = Spectra::randomVec();
-                mat = std::make_shared<Lambertian>(color);
-            } else if (picker < 0.66) {
-                dvec3 color = Spectra::randomVec();
-                double roughness = Spectra::randomDouble();
-                mat = std::make_shared<Metal>(color, roughness);
-            } else {
-                double ior = Spectra::randomDouble();
-                mat = std::make_shared<Dielectric>(ior);
-            }
-            dvec3 position((j-3.5) * 1.25, (i-1.5) * 1.25, 0.5);
-            scene.add(std::make_shared<Sphere>(position, 0.5, mat));
+    // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
+    io.ConfigDockingWithShift = false;
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+    //ImGui::StyleColorsLight();
+
+    // Setup Platform/Renderer backends
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init(glsl_version);
+
+    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+    // Main loop
+    while (!glfwWindowShouldClose(window))
+    {
+        // Poll and handle events (inputs, window resize, etc.)
+        // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
+        // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application, or clear/overwrite your copy of the mouse data.
+        // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application, or clear/overwrite your copy of the keyboard data.
+        // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
+        glfwPollEvents();
+
+        // Start the Dear ImGui frame
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
+        {
+            static float f = 0.0f;
+            static int counter = 0;
+
+            ImGui::Begin("Hello 2");                          // Create a window called "Hello, world!" and append into it.
+
+            ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+
+            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+            ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+
+            if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+                counter++;
+            ImGui::SameLine();
+            ImGui::Text("counter = %d", counter);
+
+            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+            ImGui::End();
         }
+        {
+            static float f = 0.0f;
+            static int counter = 0;
+
+            ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+
+            ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+
+            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+            ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+
+            if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+                counter++;
+            ImGui::SameLine();
+            ImGui::Text("counter = %d", counter);
+
+            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+            ImGui::End();
+        }
+
+        // Rendering
+        ImGui::Render();
+        int display_w, display_h;
+        glfwGetFramebufferSize(window, &display_w, &display_h);
+        glViewport(0, 0, display_w, display_h);
+        glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
+        glClear(GL_COLOR_BUFFER_BIT);
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        glfwSwapBuffers(window);
     }
 
-    Camera camera(8, aspectRatio, dvec3(0, -50, 35), dvec3(0, 0, 2), dvec3(0, 0, 1));
+    // Cleanup
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 
-    /*
-     * Initialize output file  
-     */
-    uint8_t* data = new uint8_t[3 * opts.width * opts.height];
-    int offset = 0;
-    
-    /*
-     * Render loop
-     */
-    printf("Starting render...");
-    for (int i = 0; i < opts.height; i++) {
-        std::cerr << "\r" << opts.height - i << " lines remaining.";
-        for (int j = 0; j < opts.width; j++) {
-            dvec3 color(0);
-            for (int s = 0; s < opts.samples; s++) {
-                double u, v;
-                u = (j + Spectra::randomDouble()) / (opts.width - 1);
-                v = (i + Spectra::randomDouble()) / (opts.height - 1);
-                Ray ray = camera.getRay(u, v);
-                color += getRayColor(ray, scene, opts.maxDepth);
-            }
-            color = glm::sqrt(color / static_cast<double>(opts.samples));
-            data[offset++] = static_cast<int>(clamp(color.x, 0, 1) * 255);
-            data[offset++] = static_cast<int>(clamp(color.y, 0, 1) * 255);
-            data[offset++] = static_cast<int>(clamp(color.z, 0, 1) * 255);
-        }
-    }
-    Spectra::writeImage("../out.png", opts.width, opts.height, data);
-    printf("\r\n");
+    glfwDestroyWindow(window);
+    glfwTerminate();
+
     return 0;
 }
