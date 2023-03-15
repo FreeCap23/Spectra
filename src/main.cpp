@@ -101,6 +101,7 @@ int main() {
     int samples = 0;
     bool shouldRender = false;
     bool renderedAtLeastOnce = false;
+    bool exportedFile = false;
     
     Renderer renderer;
     uint8_t* data = new uint8_t[10];
@@ -145,10 +146,17 @@ int main() {
                 samplesDone = 0;
                 memset(data, 0, 3 * renderOpts.width * renderOpts.height);
                 renderer.Initialize(renderOpts, data);
+                exportedFile = false;
             }
             ImGui::SameLine();
             if (ImGui::Button("Export", ImVec2(100, 25))) {
-
+                if (renderedAtLeastOnce) {
+                    Spectra::writeImage("out.png", renderOpts.width, renderOpts.height, data);
+                    exportedFile = true;
+                }
+            }
+            if (exportedFile) {
+                ImGui::Text("Render saved to out.png");
             }
             if (renderedAtLeastOnce)
                 ImGui::Text("%d / %d samples finished.", samplesDone, samples);
