@@ -10,7 +10,7 @@ void Spectra::writeImage(
         const uint8_t *data) {
 
     // Write image buffer to file
-    stbi_write_png(fileName, width, height, 3, data, 3 * width);
+    stbi_write_png(fileName, width, height, 4, data, 4 * width);
 }
 
 dvec3 Spectra::randomInUnitSphere() {

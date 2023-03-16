@@ -26,10 +26,7 @@ bool LoadTextureFromData(const uint8_t* data, GLuint* out_texture, int image_wid
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP); // Same
 
     // Upload pixels into texture
-#if defined(GL_UNPACK_ROW_LENGTH) && !defined(__EMSCRIPTEN__)
-    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-#endif
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image_width, image_height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
     *out_texture = image_texture;
     return true;
@@ -101,7 +98,9 @@ int main() {
     int samples = 0;
     bool shouldRender = false;
     bool renderedAtLeastOnce = false;
+    bool imageLoaded = false;
     bool exportedFile = false;
+    GLuint imageTexture;
     
     Renderer renderer;
     uint8_t* data = new uint8_t[10];
@@ -120,8 +119,11 @@ int main() {
             ImGui::Begin("Render result");
             viewport = ImGui::GetContentRegionAvail();
             if (renderedAtLeastOnce) {
-                GLuint imageTexture = 0;
-                LoadTextureFromData(data, &imageTexture, renderOpts.width, renderOpts.height);
+                if (!imageLoaded) {
+                    imageTexture = 0;
+                    LoadTextureFromData(data, &imageTexture, renderOpts.width, renderOpts.height);
+                    imageLoaded = true;
+                }
                 ImGui::Image((void*)(intptr_t)imageTexture, viewport);
             }
             ImGui::End();
@@ -142,9 +144,9 @@ int main() {
                 samples = renderOpts.samples;
                 renderOpts.height = tempResHeight;
                 renderOpts.width = tempResWidth;
-                data = new uint8_t[3 * renderOpts.width * renderOpts.height];
+                data = new uint8_t[4 * renderOpts.width * renderOpts.height];
                 samplesDone = 0;
-                memset(data, 0, 3 * renderOpts.width * renderOpts.height);
+                memset(data, 0, 4 * renderOpts.width * renderOpts.height);
                 renderer.Initialize(renderOpts, data);
                 exportedFile = false;
             }
@@ -166,6 +168,7 @@ int main() {
             samplesDone++;
             renderer.Render(data);
             renderedAtLeastOnce = true;
+            imageLoaded = false;
         }
 
         // Rendering

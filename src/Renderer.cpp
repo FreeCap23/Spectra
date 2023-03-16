@@ -82,6 +82,7 @@ void Renderer::Render(uint8_t* data) {
             data[offset++] += static_cast<int>(clamp(color.x, 0, 1) * 255);
             data[offset++] += static_cast<int>(clamp(color.y, 0, 1) * 255);
             data[offset++] += static_cast<int>(clamp(color.z, 0, 1) * 255);
+            data[offset++] = 255; // Alpha channel
         }
     }
 }
