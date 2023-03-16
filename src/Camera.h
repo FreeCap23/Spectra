@@ -6,6 +6,7 @@ using glm::dvec3;
 
 class Camera {
  public:
+    Camera() {}
     Camera(
       double fov,
       double aspectRatio,

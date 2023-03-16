@@ -7,12 +7,10 @@ void Spectra::writeImage(
         const char *fileName,
         int width,
         int height,
-        uint8_t *data) {
-    // Flip image vertically
-    stbi_flip_vertically_on_write(1);
+        const uint8_t *data) {
 
     // Write image buffer to file
-    stbi_write_png(fileName, width, height, 3, data, 3 * width);
+    stbi_write_png(fileName, width, height, 4, data, 4 * width);
 }
 
 dvec3 Spectra::randomInUnitSphere() {

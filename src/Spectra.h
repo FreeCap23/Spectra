@@ -41,5 +41,5 @@ namespace Spectra {
      * Will return a random dvec3 inside a sphere of radius 1
     */
     dvec3 randomInUnitSphere();
-    void writeImage(const char* fileName, int width, int height, uint8_t* data);
+    void writeImage(const char* fileName, int width, int height, const uint8_t* data);
 }
