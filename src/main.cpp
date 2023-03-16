@@ -154,7 +154,7 @@ int main() {
                 data = new uint8_t[4 * renderOpts.width * renderOpts.height];
                 samplesDone = 0;
                 memset(data, 0, 4 * renderOpts.width * renderOpts.height);
-                renderer.Initialize(renderOpts, data);
+                renderer.Initialize(renderOpts);
                 exportedFile = false;
             }
             ImGui::SameLine();

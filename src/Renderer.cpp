@@ -29,7 +29,7 @@ double Renderer::clamp(double value, double min, double max) {
     return value;
 }
 
-void Renderer::Initialize(options opts, uint8_t* data) {
+void Renderer::Initialize(options opts) {
     m_opts = opts;
     /*
      * Render options

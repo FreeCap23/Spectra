@@ -22,7 +22,7 @@ class Renderer {
     Renderer() {};
     dvec3 getRayColor(Ray ray, int depth);
     double clamp(double value, double min, double max);
-    void Initialize(options opts, uint8_t* data);
+    void Initialize(options opts);
     void Render(uint8_t* data);
 
  private:
