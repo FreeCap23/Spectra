@@ -7,7 +7,7 @@ void Spectra::writeImage(
         const char *fileName,
         int width,
         int height,
-        uint8_t *data) {
+        const uint8_t *data) {
 
     // Write image buffer to file
     stbi_write_png(fileName, width, height, 3, data, 3 * width);
