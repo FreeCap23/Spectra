@@ -103,7 +103,7 @@ int main() {
     GLuint imageTexture;
     
     Renderer renderer;
-    uint8_t* data = new uint8_t[10];
+    uint8_t* data;
 
     // Main loop
     while (!glfwWindowShouldClose(window))
@@ -114,6 +114,13 @@ int main() {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+
+        if (shouldRender && samplesDone < samples) {
+            renderer.Render(data);
+            samplesDone++;
+            renderedAtLeastOnce = true;
+            imageLoaded = false;
+        }
 
         {
             ImGui::Begin("Render result");
@@ -163,12 +170,6 @@ int main() {
             if (renderedAtLeastOnce)
                 ImGui::Text("%d / %d samples finished.", samplesDone, samples);
             ImGui::End();
-        }
-        if (shouldRender && samplesDone < samples) {
-            samplesDone++;
-            renderer.Render(data);
-            renderedAtLeastOnce = true;
-            imageLoaded = false;
         }
 
         // Rendering
