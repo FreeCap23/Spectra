@@ -8,6 +8,9 @@ This is the most recent image rendered. It shows 32 spheres with randomly genera
 
 ![Image rendered with Spectra](out.png)
 
+## GUI Screenshot
+![Screenshot of the GUI](gui.png)
+
 ## Features
 - Cross-platform
 - A Graphical User Interface
