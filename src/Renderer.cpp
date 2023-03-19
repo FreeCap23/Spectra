@@ -42,8 +42,8 @@ void Renderer::Initialize(options opts) {
     auto matGround = std::make_shared<Lambertian>(dvec3(0.2, 0.8, 0.5));
     auto matMirror = std::make_shared<Metal>(dvec3(1, 1, 1), 0.02);
 
-    m_scene.add(std::make_shared<Plane>(dvec3(0, 0, 1), 0, matGround));
-    m_scene.add(std::make_shared<Plane>(dvec3(0, -1, 0), 3, matMirror));
+    m_scene.addPlane(matGround, dvec3(0, 0, 1), 0);
+    m_scene.addPlane(matMirror, dvec3(0, -1, 0), 3);
 
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 8; j++) {
@@ -61,10 +61,10 @@ void Renderer::Initialize(options opts) {
                 mat = std::make_shared<Dielectric>(ior);
             }
             dvec3 position((j-3.5) * 1.25, (i-1.5) * 1.25, 0.5);
-            m_scene.add(std::make_shared<Sphere>(position, 0.5, mat));
+            m_scene.addSphere(mat, position, 0.5);
         }
     }
-    m_camera = std::make_shared<Orthographic>(2, aspectRatio, dvec3(0, -50, 35), dvec3(0, 0, 2), dvec3(0, 0, 1));
+    m_camera = std::make_shared<Orthographic>(4, aspectRatio, dvec3(0, -50, 35), dvec3(0, 0, 2), dvec3(0, 0, 1));
 }
 
 void Renderer::Render(uint8_t* data) {
