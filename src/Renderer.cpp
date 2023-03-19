@@ -64,7 +64,7 @@ void Renderer::Initialize(options opts) {
             m_scene.add(std::make_shared<Sphere>(position, 0.5, mat));
         }
     }
-    m_camera = Camera(8, aspectRatio, dvec3(0, -50, 35), dvec3(0, 0, 2), dvec3(0, 0, 1));
+    m_camera = std::make_shared<Orthographic>(2, aspectRatio, dvec3(0, -50, 35), dvec3(0, 0, 2), dvec3(0, 0, 1));
 }
 
 void Renderer::Render(uint8_t* data) {
@@ -76,7 +76,7 @@ void Renderer::Render(uint8_t* data) {
             double u, v;
             u = (j + Spectra::randomDouble()) / (m_opts.width - 1);
             v = (i + Spectra::randomDouble()) / (m_opts.height - 1);
-            Ray ray = m_camera.getRay(u, v);
+            Ray ray = m_camera->getRay(u, v);
             color = getRayColor(ray, m_opts.maxDepth);
             color = (color / static_cast<double>(m_opts.samples));
             data[offset++] += static_cast<int>(clamp(color.x, 0, 1) * 255);

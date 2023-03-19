@@ -1,6 +1,7 @@
 #pragma once
 #include <stdio.h>
 #include <iostream>
+#include <memory.h>
 #include "Spectra.h"
 #include "Ray.h"
 #include "Scene.h"
@@ -27,6 +28,6 @@ class Renderer {
 
  private:
     options m_opts;
-    Camera m_camera;
+    std::shared_ptr<Camera> m_camera;
     Scene m_scene;
 };
