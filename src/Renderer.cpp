@@ -41,9 +41,9 @@ void Renderer::Render(uint8_t* data) {
             Ray ray = m_scene.camera->getRay(u, v);
             color = getRayColor(ray, m_opts.maxDepth);
             color = (color / static_cast<double>(m_opts.samples));
-            data[offset++] += static_cast<int>(clamp(color.x, 0, 1) * 255);
-            data[offset++] += static_cast<int>(clamp(color.y, 0, 1) * 255);
-            data[offset++] += static_cast<int>(clamp(color.z, 0, 1) * 255);
+            data[offset++] += static_cast<uint8_t>(clamp(color.x, 0, 1) * 255);
+            data[offset++] += static_cast<uint8_t>(clamp(color.y, 0, 1) * 255);
+            data[offset++] += static_cast<uint8_t>(clamp(color.z, 0, 1) * 255);
             data[offset++] = 255; // Alpha channel
         }
     }

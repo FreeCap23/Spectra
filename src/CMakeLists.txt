@@ -7,7 +7,7 @@ project(Spectra)
 
 if ( MSVC )
     message("Detected MSVC.")
-    add_compile_options(/Wall /DEBUG:FULL)
+    add_compile_options(/W4 /DEBUG:FULL)
 else ()
     add_compile_options(-Wall -Wextra -Og -g)
 

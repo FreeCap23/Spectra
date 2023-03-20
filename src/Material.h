@@ -17,12 +17,7 @@ class Material {
 class Lambertian : public Material {
  public:
     Lambertian(dvec3 albedo) : m_albedo(albedo) {}
-    virtual bool scatter(
-        Ray ray,
-        hitRecord hits,
-        dvec3& attenuation,
-        Ray& scattered)
-    const override {
+    virtual bool scatter(Ray, hitRecord hits, dvec3& attenuation, Ray& scattered) const override {
         dvec3 scatterDirection = hits.normal + Spectra::randomInUnitSphere();
         // If the vector is near zero that means the normal and the target vectors
         // cancelled each other out. To remedy this, just set the scatterDirection

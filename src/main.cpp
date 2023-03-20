@@ -132,12 +132,12 @@ int main() {
     bool imageLoaded = false;
     bool exportedFile = false;
     bool ortho = true;
-    GLuint imageTexture;
+    GLuint imageTexture = 0;
     
     Scene scene;
     createScene(scene);
     Renderer renderer(scene, renderOpts);
-    uint8_t* data;
+    uint8_t* data = (uint8_t*)malloc(0);
 
     // Main loop
     while (!glfwWindowShouldClose(window))
@@ -176,8 +176,8 @@ int main() {
 
             // Temporary values for the render resolution
             int tempResWidth, tempResHeight;
-            tempResHeight = (renderScale / 100.0) * viewport.y;
-            tempResWidth = (renderScale / 100.0) * viewport.x;
+            tempResHeight = static_cast<int>((renderScale / 100.0) * viewport.y);
+            tempResWidth = static_cast<int>((renderScale / 100.0) * viewport.x);
             ImGui::SliderInt("Render scale", &renderScale, 1, 100, "%d%%");
             ImGui::Text("%dx%d", tempResWidth, tempResHeight);
             ImGui::InputInt("Samples", &renderOpts.samples, 5, 100, 0);
