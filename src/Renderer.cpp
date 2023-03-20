@@ -29,14 +29,6 @@ double Renderer::clamp(double value, double min, double max) {
     return value;
 }
 
-void Renderer::Initialize(options opts) {
-    m_opts = opts;
-    /*
-     * Render options
-     */
-    const double aspectRatio = static_cast<double>(opts.width) / opts.height;
-}
-
 void Renderer::Render(uint8_t* data) {
     int offset = 0;
     static dvec3 color;

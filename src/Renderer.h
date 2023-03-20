@@ -20,13 +20,12 @@ struct options {
 
 class Renderer {
  public:
-    Renderer(Scene& scene) : m_scene(scene) {}
+    Renderer(Scene& scene, options& opts) : m_scene(scene), m_opts(opts) {}
     dvec3 getRayColor(Ray ray, int depth);
     double clamp(double value, double min, double max);
-    void Initialize(options opts);
     void Render(uint8_t* data);
 
  private:
-    options m_opts;
+    options& m_opts;
     Scene& m_scene;
 };

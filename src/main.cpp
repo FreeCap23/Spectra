@@ -133,7 +133,8 @@ int main() {
     GLuint imageTexture;
     
     Scene scene;
-    Renderer renderer(scene);
+    createScene(scene);
+    Renderer renderer(scene, renderOpts);
     uint8_t* data;
 
     // Main loop
@@ -187,7 +188,6 @@ int main() {
                 data = new uint8_t[4 * renderOpts.width * renderOpts.height];
                 samplesDone = 0;
                 memset(data, 0, 4 * renderOpts.width * renderOpts.height);
-                createScene(scene);
                 auto cam = std::shared_ptr<Camera>();
                 if (ortho) {
                     cam = std::make_shared<Orthographic>(4, (double)renderOpts.width/renderOpts.height, dvec3(0, -50, 35), dvec3(0, 0, 2), dvec3(0, 0, 1));
@@ -195,7 +195,6 @@ int main() {
                     cam = std::make_shared<Perspective>(8, (double)renderOpts.width/renderOpts.height, dvec3(0, -50, 35), dvec3(0, 0, 2), dvec3(0, 0, 1));
                 }
                 scene.setCamera(cam);
-                renderer.Initialize(renderOpts);
                 exportedFile = false;
             }
             ImGui::SameLine();
@@ -207,6 +206,9 @@ int main() {
             }
             if (ImGui::CollapsingHeader("Camera options")) {
                 ImGui::Checkbox("Orthographic", &ortho);
+            }
+            if (ImGui::CollapsingHeader("Object properties")) {
+                ImGui::Text("Type: ");
             }
             if (exportedFile) {
                 ImGui::Text("Render saved to out.png");
