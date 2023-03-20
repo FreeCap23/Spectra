@@ -16,6 +16,8 @@ bool LoadTextureFromData(const uint8_t* data, GLuint* out_texture, int image_wid
 
     // Create a OpenGL texture identifier
     GLuint image_texture;
+    // Delete the texture, if previously created, to stop a memory leak
+    glDeleteTextures(1, &image_texture);
     glGenTextures(1, &image_texture);
     glBindTexture(GL_TEXTURE_2D, image_texture);
 
