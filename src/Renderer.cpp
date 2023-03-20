@@ -33,7 +33,7 @@ void Renderer::Render(uint8_t* data) {
     int offset = 0;
     static dvec3 color;
     for (int i = m_opts.height; i > 0; i--) {
-        std::cerr << "\r" << i-1 << " lines remaining.";
+        std::cerr << "\r" << i-1 << "\t lines remaining.";
         for (int j = 0; j < m_opts.width; j++) {
             double u, v;
             u = (j + Spectra::randomDouble()) / (m_opts.width - 1);
