@@ -16,6 +16,7 @@ This is the most recent image rendered. It shows 32 spheres with randomly genera
 - A Graphical User Interface
 - Stochastic Multi-Sampling anti-aliasing
 - Materials
+- Perspective & Orthographic camera
 
 ## Motivation
 I've been interested in raytracing for some time, so I decided to try to write one myself.

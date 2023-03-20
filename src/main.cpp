@@ -32,6 +32,34 @@ bool LoadTextureFromData(const uint8_t* data, GLuint* out_texture, int image_wid
     return true;
 }
 
+void createScene(Scene& scene) {
+    auto matGround = std::make_shared<Lambertian>(dvec3(0.2, 0.8, 0.5));
+    auto matMirror = std::make_shared<Metal>(dvec3(1, 1, 1), 0.02);
+
+    scene.addPlane(matGround, dvec3(0, 0, 1), 0);
+    scene.addPlane(matMirror, dvec3(0, -1, 0), 3);
+
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 8; j++) {
+            double picker = Spectra::randomDouble();
+            std::shared_ptr<Material> mat;
+            if (picker < 0.33) {
+                dvec3 color = Spectra::randomVec();
+                mat = std::make_shared<Lambertian>(color);
+            } else if (picker < 0.66) {
+                dvec3 color = Spectra::randomVec();
+                double roughness = Spectra::randomDouble();
+                mat = std::make_shared<Metal>(color, roughness);
+            } else {
+                double ior = Spectra::randomDouble();
+                mat = std::make_shared<Dielectric>(ior);
+            }
+            dvec3 position((j-3.5) * 1.25, (i-1.5) * 1.25, 0.5);
+            scene.addSphere(mat, position, 0.5);
+        }
+    }
+}
+
 int main() {
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
@@ -101,9 +129,11 @@ int main() {
     bool renderedAtLeastOnce = false;
     bool imageLoaded = false;
     bool exportedFile = false;
+    bool ortho = true;
     GLuint imageTexture;
     
-    Renderer renderer;
+    Scene scene;
+    Renderer renderer(scene);
     uint8_t* data;
 
     // Main loop
@@ -157,6 +187,14 @@ int main() {
                 data = new uint8_t[4 * renderOpts.width * renderOpts.height];
                 samplesDone = 0;
                 memset(data, 0, 4 * renderOpts.width * renderOpts.height);
+                createScene(scene);
+                auto cam = std::shared_ptr<Camera>();
+                if (ortho) {
+                    cam = std::make_shared<Orthographic>(4, (double)renderOpts.width/renderOpts.height, dvec3(0, -50, 35), dvec3(0, 0, 2), dvec3(0, 0, 1));
+                } else {
+                    cam = std::make_shared<Perspective>(8, (double)renderOpts.width/renderOpts.height, dvec3(0, -50, 35), dvec3(0, 0, 2), dvec3(0, 0, 1));
+                }
+                scene.setCamera(cam);
                 renderer.Initialize(renderOpts);
                 exportedFile = false;
             }
@@ -166,6 +204,9 @@ int main() {
                     Spectra::writeImage("out.png", renderOpts.width, renderOpts.height, data);
                     exportedFile = true;
                 }
+            }
+            if (ImGui::CollapsingHeader("Camera options")) {
+                ImGui::Checkbox("Orthographic", &ortho);
             }
             if (exportedFile) {
                 ImGui::Text("Render saved to out.png");

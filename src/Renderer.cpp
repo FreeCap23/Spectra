@@ -35,36 +35,6 @@ void Renderer::Initialize(options opts) {
      * Render options
      */
     const double aspectRatio = static_cast<double>(opts.width) / opts.height;
-
-    /*
-     * Initialize scene
-     */
-    auto matGround = std::make_shared<Lambertian>(dvec3(0.2, 0.8, 0.5));
-    auto matMirror = std::make_shared<Metal>(dvec3(1, 1, 1), 0.02);
-
-    m_scene.addPlane(matGround, dvec3(0, 0, 1), 0);
-    m_scene.addPlane(matMirror, dvec3(0, -1, 0), 3);
-
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 8; j++) {
-            double picker = Spectra::randomDouble();
-            std::shared_ptr<Material> mat;
-            if (picker < 0.33) {
-                dvec3 color = Spectra::randomVec();
-                mat = std::make_shared<Lambertian>(color);
-            } else if (picker < 0.66) {
-                dvec3 color = Spectra::randomVec();
-                double roughness = Spectra::randomDouble();
-                mat = std::make_shared<Metal>(color, roughness);
-            } else {
-                double ior = Spectra::randomDouble();
-                mat = std::make_shared<Dielectric>(ior);
-            }
-            dvec3 position((j-3.5) * 1.25, (i-1.5) * 1.25, 0.5);
-            m_scene.addSphere(mat, position, 0.5);
-        }
-    }
-    m_camera = std::make_shared<Orthographic>(4, aspectRatio, dvec3(0, -50, 35), dvec3(0, 0, 2), dvec3(0, 0, 1));
 }
 
 void Renderer::Render(uint8_t* data) {
@@ -76,7 +46,7 @@ void Renderer::Render(uint8_t* data) {
             double u, v;
             u = (j + Spectra::randomDouble()) / (m_opts.width - 1);
             v = (i + Spectra::randomDouble()) / (m_opts.height - 1);
-            Ray ray = m_camera->getRay(u, v);
+            Ray ray = m_scene.camera->getRay(u, v);
             color = getRayColor(ray, m_opts.maxDepth);
             color = (color / static_cast<double>(m_opts.samples));
             data[offset++] += static_cast<int>(clamp(color.x, 0, 1) * 255);

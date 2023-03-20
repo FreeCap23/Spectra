@@ -20,7 +20,7 @@ struct options {
 
 class Renderer {
  public:
-    Renderer() {};
+    Renderer(Scene& scene) : m_scene(scene) {}
     dvec3 getRayColor(Ray ray, int depth);
     double clamp(double value, double min, double max);
     void Initialize(options opts);
@@ -28,6 +28,5 @@ class Renderer {
 
  private:
     options m_opts;
-    std::shared_ptr<Camera> m_camera;
-    Scene m_scene;
+    Scene& m_scene;
 };
