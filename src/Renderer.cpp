@@ -31,7 +31,8 @@ double Renderer::clamp(double value, double min, double max) {
 
 void Renderer::Render(uint8_t* data) {
     int offset = 0;
-    static dvec3 color;
+    int accOffset = 0;
+    dvec3 color;
     for (int i = m_opts.height; i > 0; i--) {
         std::cerr << "\r" << i-1 << "\t lines remaining.";
         for (int j = 0; j < m_opts.width; j++) {
@@ -40,11 +41,17 @@ void Renderer::Render(uint8_t* data) {
             v = (i + Spectra::randomDouble()) / (m_opts.height - 1);
             Ray ray = m_scene.camera->getRay(u, v);
             color = getRayColor(ray, m_opts.maxDepth);
-            color = (color / static_cast<double>(m_opts.samples));
-            data[offset++] += static_cast<uint8_t>(clamp(color.x, 0, 1) * 255);
-            data[offset++] += static_cast<uint8_t>(clamp(color.y, 0, 1) * 255);
-            data[offset++] += static_cast<uint8_t>(clamp(color.z, 0, 1) * 255);
+            m_accumulation[accOffset] += glm::dvec4(color, 1);
+            data[offset++] = static_cast<uint8_t>(m_accumulation[accOffset].x / samplesDone * 255);
+            data[offset++] = static_cast<uint8_t>(m_accumulation[accOffset].y / samplesDone * 255);
+            data[offset++] = static_cast<uint8_t>(m_accumulation[accOffset].z / samplesDone * 255);
             data[offset++] = 255; // Alpha channel
+            accOffset++;
         }
     }
+}
+
+void Renderer::resetBuffer() {
+    m_accumulation.assign(m_opts.width * m_opts.height, glm::dvec4(0));
+    samplesDone = 0;
 }

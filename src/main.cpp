@@ -125,13 +125,11 @@ int main() {
     renderOpts.width = 1;
     int renderScale = 100;
     ImVec2 viewport(800, 600);
-    int samplesDone = 0;
-    int samples = 0;
     bool shouldRender = false;
     bool renderedAtLeastOnce = false;
     bool imageLoaded = false;
     bool exportedFile = false;
-    bool ortho = true;
+    bool ortho = false;
     GLuint imageTexture = 0;
     
     Scene scene;
@@ -149,9 +147,9 @@ int main() {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        if (shouldRender && samplesDone < samples) {
+        if (shouldRender) {
+            renderer.samplesDone++;
             renderer.Render(data);
-            samplesDone++;
             renderedAtLeastOnce = true;
             imageLoaded = false;
         }
@@ -180,23 +178,24 @@ int main() {
             tempResWidth = static_cast<int>((renderScale / 100.0) * viewport.x);
             ImGui::SliderInt("Render scale", &renderScale, 1, 100, "%d%%");
             ImGui::Text("%dx%d", tempResWidth, tempResHeight);
-            ImGui::InputInt("Samples", &renderOpts.samples, 5, 100, 0);
             ImGui::InputInt("Max Depth", &renderOpts.maxDepth, 5, 100, 0);
             if (ImGui::Button("Render", ImVec2(100, 25))) {
                 shouldRender = true;
-                samples = renderOpts.samples;
                 renderOpts.height = tempResHeight;
                 renderOpts.width = tempResWidth;
                 data = new uint8_t[4 * renderOpts.width * renderOpts.height];
-                samplesDone = 0;
                 memset(data, 0, 4 * renderOpts.width * renderOpts.height);
                 auto cam = std::shared_ptr<Camera>();
+                double aspectRatio = (double)renderOpts.width/renderOpts.height;
+                dvec3 position(0, -50, 35);
+                dvec3 lookAt(0, 0, 2);
                 if (ortho) {
-                    cam = std::make_shared<Orthographic>(4, (double)renderOpts.width/renderOpts.height, dvec3(0, -50, 35), dvec3(0, 0, 2), dvec3(0, 0, 1));
+                    cam = std::make_shared<Orthographic>(4, aspectRatio, position, lookAt, dvec3(0, 0, 1));
                 } else {
-                    cam = std::make_shared<Perspective>(8, (double)renderOpts.width/renderOpts.height, dvec3(0, -50, 35), dvec3(0, 0, 2), dvec3(0, 0, 1));
+                    cam = std::make_shared<Perspective>(8, aspectRatio, position, lookAt, dvec3(0, 0, 1));
                 }
                 scene.setCamera(cam);
+                renderer.resetBuffer();
                 exportedFile = false;
             }
             ImGui::SameLine();
@@ -216,7 +215,7 @@ int main() {
                 ImGui::Text("Render saved to out.png");
             }
             if (renderedAtLeastOnce)
-                ImGui::Text("%d / %d samples finished.", samplesDone, samples);
+                ImGui::Text("%d samples finished.", renderer.samplesDone);
             ImGui::End();
         }
 
