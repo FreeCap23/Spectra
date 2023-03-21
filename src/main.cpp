@@ -208,9 +208,6 @@ int main() {
             if (ImGui::CollapsingHeader("Camera options")) {
                 ImGui::Checkbox("Orthographic", &ortho);
             }
-            if (ImGui::CollapsingHeader("Object properties")) {
-                ImGui::Text("Type: ");
-            }
             if (exportedFile) {
                 ImGui::Text("Render saved to out.png");
             }
