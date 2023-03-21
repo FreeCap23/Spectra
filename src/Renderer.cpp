@@ -42,9 +42,9 @@ void Renderer::Render(uint8_t* data) {
             Ray ray = m_scene.camera->getRay(u, v);
             color = getRayColor(ray, m_opts.maxDepth);
             m_accumulation[accOffset] += glm::dvec4(color, 1);
-            data[offset++] = static_cast<uint8_t>(m_accumulation[accOffset].x / samplesDone * 255);
-            data[offset++] = static_cast<uint8_t>(m_accumulation[accOffset].y / samplesDone * 255);
-            data[offset++] = static_cast<uint8_t>(m_accumulation[accOffset].z / samplesDone * 255);
+            data[offset++] = static_cast<uint8_t>(glm::sqrt(m_accumulation[accOffset].x / samplesDone) * 255);
+            data[offset++] = static_cast<uint8_t>(glm::sqrt(m_accumulation[accOffset].y / samplesDone) * 255);
+            data[offset++] = static_cast<uint8_t>(glm::sqrt(m_accumulation[accOffset].z / samplesDone) * 255);
             data[offset++] = 255; // Alpha channel
             accOffset++;
         }
