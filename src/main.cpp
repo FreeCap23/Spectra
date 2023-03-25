@@ -4,63 +4,16 @@
 #include "imgui/imgui_impl_opengl3.h"
 #include "GLFW/glfw3.h"
 
-static void glfw_error_callback(int error, const char* description)
-{
-    fprintf(stderr, "GLFW Error %d: %s\n", error, description);
-}
+// Forward declarations
+
+// Error callback function
+static void glfw_error_callback(int error, const char* description);
 
 // Simple helper function to load an image into a OpenGL texture with common settings
-bool LoadTextureFromData(const uint8_t* data, GLuint* out_texture, int image_width, int image_height) {
-    if (data == NULL)
-        return false;
+bool LoadTextureFromData(const uint8_t* data, GLuint* out_texture, int image_width, int image_height);
 
-    // Create a OpenGL texture identifier
-    GLuint image_texture;
-    // Delete the texture, if previously created, to stop a memory leak
-    glDeleteTextures(1, &image_texture);
-    glGenTextures(1, &image_texture);
-    glBindTexture(GL_TEXTURE_2D, image_texture);
-
-    // Setup filtering parameters for display
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP); // This is required on WebGL for non power-of-two textures
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP); // Same
-
-    // Upload pixels into texture
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-
-    *out_texture = image_texture;
-    return true;
-}
-
-void createScene(Scene& scene) {
-    auto matGround = std::make_shared<Lambertian>(dvec3(0.2, 0.8, 0.5));
-    auto matMirror = std::make_shared<Metal>(dvec3(1, 1, 1), 0.02);
-
-    scene.addPlane(matGround, dvec3(0, 0, 1), 0);
-    scene.addPlane(matMirror, dvec3(0, -1, 0), 3);
-
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 8; j++) {
-            double picker = Spectra::randomDouble();
-            std::shared_ptr<Material> mat;
-            if (picker < 0.33) {
-                dvec3 color = Spectra::randomVec();
-                mat = std::make_shared<Lambertian>(color);
-            } else if (picker < 0.66) {
-                dvec3 color = Spectra::randomVec();
-                double roughness = Spectra::randomDouble();
-                mat = std::make_shared<Metal>(color, roughness);
-            } else {
-                double ior = Spectra::randomDouble();
-                mat = std::make_shared<Dielectric>(ior);
-            }
-            dvec3 position((j-3.5) * 1.25, (i-1.5) * 1.25, 0.5);
-            scene.addSphere(mat, position, 0.5);
-        }
-    }
-}
+// Function that initializes the scene
+void createScene(Scene& scene);
 
 int main() {
     glfwSetErrorCallback(glfw_error_callback);
@@ -145,8 +98,9 @@ int main() {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-
         ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
+
+        // Every frame, checks if it needs to render a new sample
         if (shouldRender) {
             renderer.samplesDone++;
             renderer.Render(data);
@@ -154,6 +108,7 @@ int main() {
             imageLoaded = false;
         }
 
+        // Render result window
         {
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
             ImGui::Begin("Render result");
@@ -169,6 +124,8 @@ int main() {
             ImGui::End();
             ImGui::PopStyleVar();
         }
+
+        // Render options window
         {
             ImGui::Begin("Render options");
 
@@ -176,46 +133,60 @@ int main() {
             int tempResWidth, tempResHeight;
             tempResHeight = static_cast<int>((renderScale / 100.0) * viewport.y);
             tempResWidth = static_cast<int>((renderScale / 100.0) * viewport.x);
+
             ImGui::SliderInt("Render scale", &renderScale, 1, 100, "%d%%");
             ImGui::Text("%dx%d", tempResWidth, tempResHeight);
             ImGui::InputInt("Max Depth", &renderOpts.maxDepth, 5, 100, 0);
+
             if (ImGui::Button("Render", ImVec2(100, 25))) {
+                // Initialize rendering parameters
                 shouldRender = true;
                 renderOpts.height = tempResHeight;
                 renderOpts.width = tempResWidth;
+
+                // Initialize data buffer
                 data = new uint8_t[4 * renderOpts.width * renderOpts.height];
                 memset(data, 0, 4 * renderOpts.width * renderOpts.height);
+
+                // Initialize camera
                 auto cam = std::shared_ptr<Camera>();
                 double aspectRatio = (double)renderOpts.width/renderOpts.height;
                 dvec3 position(0, -50, 35);
                 dvec3 lookAt(0, 0, 2);
                 if (ortho) {
-                    cam = std::make_shared<Orthographic>(4, aspectRatio, position, lookAt, dvec3(0, 0, 1));
+                    cam = std::make_shared<Orthographic>(5, aspectRatio, position, lookAt, dvec3(0, 0, 1));
                 } else {
-                    cam = std::make_shared<Perspective>(8, aspectRatio, position, lookAt, dvec3(0, 0, 1));
+                    cam = std::make_shared<Perspective>(10, aspectRatio, position, lookAt, dvec3(0, 0, 1));
                 }
                 scene.setCamera(cam);
+
+                // Reset previous render buffer
                 renderer.resetBuffer();
+
+                // Stop displaying "Render saved to ..." message
                 exportedFile = false;
             }
             ImGui::SameLine();
-            if (ImGui::Button("Export", ImVec2(100, 25))) {
+            if (ImGui::Button("Export", ImVec2(100, 25)))
                 if (renderedAtLeastOnce) {
                     Spectra::writeImage("out.png", renderOpts.width, renderOpts.height, data);
                     exportedFile = true;
                 }
-            }
+
             if (ImGui::CollapsingHeader("Camera options")) {
                 ImGui::Checkbox("Orthographic", &ortho);
             }
-            if (exportedFile) {
+
+            if (exportedFile) 
                 ImGui::Text("Render saved to out.png");
-            }
+
             if (renderedAtLeastOnce)
                 ImGui::Text("%d samples finished.", renderer.samplesDone);
+
             if (shouldRender)
                 if (ImGui::Button("Stop"))
                     shouldRender = false;
+
             ImGui::End();
         }
 
@@ -239,4 +210,49 @@ int main() {
     glfwTerminate();
 
     return 0;
+}
+
+static void glfw_error_callback(int error, const char* description) {
+    fprintf(stderr, "GLFW Error %d: %s\n", error, description);
+}
+
+bool LoadTextureFromData(const uint8_t* data, GLuint* out_texture, int image_width, int image_height) {
+    if (data == NULL)
+        return false;
+
+    // Create a OpenGL texture identifier
+    GLuint image_texture;
+    // Delete the texture, if previously created, to stop a memory leak
+    glDeleteTextures(1, &image_texture);
+    glGenTextures(1, &image_texture);
+    glBindTexture(GL_TEXTURE_2D, image_texture);
+
+    // Setup filtering parameters for display
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP); // This is required on WebGL for non power-of-two textures
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP); // Same
+
+    // Upload pixels into texture
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+    *out_texture = image_texture;
+    return true;
+}
+
+void createScene(Scene& scene) {
+    auto matGround = std::make_shared<Lambertian>(dvec3(0.2, 0.8, 0.5));
+    auto matMirror = std::make_shared<Metal>(dvec3(1, 0.6, 0.8), 0.02);
+
+    scene.addPlane(matGround, dvec3(0, 0, 1), 0);
+    scene.addPlane(matMirror, dvec3(0, -1, 0), 3);
+
+    std::shared_ptr<Material> matSphere = std::make_shared<Metal>(dvec3(1), 0);
+    scene.addSphere(matSphere, dvec3(0, 0, 1.5), 1.5);
+
+    matSphere = std::make_shared<Lambertian>(dvec3(1));
+    scene.addSphere(matSphere, dvec3(-4, 0, 1.5), 1.5);
+
+    matSphere = std::make_shared<Lambertian>(dvec3(0.2));
+    scene.addSphere(matSphere, dvec3(4, 0, 1.5), 1.5);
 }

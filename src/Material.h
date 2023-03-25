@@ -43,7 +43,7 @@ class Metal : public Material {
         dvec3& attenuation,
         Ray& scattered)
     const override {
-        dvec3 reflected = Spectra::reflect(glm::normalize(ray.getDirection()), hits.normal);
+        dvec3 reflected = glm::reflect(glm::normalize(ray.getDirection()), hits.normal);
         dvec3 roughReflected =
             reflected
             + m_roughness
@@ -80,9 +80,9 @@ class Dielectric : public Material {
         bool cannotRefract = refractionRatio * sinTheta > 1.0;
         dvec3 scatteredDir;
         if (cannotRefract || getReflectance(cosTheta, refractionRatio) > Spectra::randomDouble())
-            scatteredDir = Spectra::reflect(unitDir, hits.normal);
+            scatteredDir = glm::reflect(unitDir, hits.normal);
         else
-            scatteredDir = Spectra::refract(unitDir, hits.normal, refractionRatio);
+            scatteredDir = glm::refract(unitDir, hits.normal, refractionRatio);
         scattered = Ray(hits.intersection, scatteredDir);
         return true;
     }

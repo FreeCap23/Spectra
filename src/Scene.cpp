@@ -13,6 +13,7 @@ bool Scene::hit(Ray& ray, double t_min, double t_max, hitRecord& hits) const {
     bool hitAnything = false;
     double t = t_max;
 
+    // Loop through all objects in the scene & check for intersections
     for (std::shared_ptr<Entity> object : m_objects) {
         if (object->hit(ray, t_min, t, tempRec)) {
             hitAnything = true;

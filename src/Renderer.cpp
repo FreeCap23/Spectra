@@ -1,6 +1,7 @@
 #include "Renderer.h"
 
 dvec3 Renderer::getRayColor(Ray ray, int depth) {
+    // Early return if recursion depth hit its limit
     if (depth <= 0) {
         return dvec3(0);
     }
@@ -14,9 +15,8 @@ dvec3 Renderer::getRayColor(Ray ray, int depth) {
         return dvec3(0);
     }
 
-    double angleWithHorizon =
-        glm::dot(ray.getDirection(), dvec3(0, 0, 1))
-        / glm::length(ray.getDirection());
+    // If no object in the scene has been hit, calculate sky color
+    double angleWithHorizon = glm::dot(ray.getDirection(), dvec3(0, 0, 1)) / glm::length(ray.getDirection());
     angleWithHorizon = (angleWithHorizon + 1) / 2.0;
     return (1.0-angleWithHorizon)*dvec3(1.0, 1.0, 1.0) + angleWithHorizon*dvec3(0.5, 0.7, 1.0);
 }

@@ -8,7 +8,7 @@ Perspective::Perspective(
     dvec3 lookAt,
     dvec3 vectUp) :
     m_aspectRatio(aspectRatio), m_origin(origin) {
-    double theta = Spectra::degrees_to_radians(fov);
+    double theta = glm::radians(fov);
     double h = tan(theta / 2.0);
     double vpHeight = 2.0 * h;
     double vpWidth = m_aspectRatio * vpHeight;
