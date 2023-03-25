@@ -9,38 +9,27 @@
 using glm::dvec3;
 
 const double infinity = std::numeric_limits<double>::infinity();
-const double pi = 3.1415926535897932385;
 
 namespace Spectra {
     /**
      * Returns a random number in the (0, 1) range
     */
-    inline double randomDouble() {
-        static std::uniform_real_distribution<double> distribution(0.0, 1.0);
-        static std::mt19937 generator(1);
-        return distribution(generator);
-    }
+    double randomDouble();
+
     /**
      * Returns a random number in the given range
     */
-    inline double randomDouble(double min, double max) {
-        static std::uniform_real_distribution<double> distribution(min, max);
-        static std::mt19937 generator(1);
-        return distribution(generator);
-    }
+    double randomDouble(double min, double max);
 
     /**
      * Returns a vector containing 3 random numbers in the (0, 1) range
     */
-    inline static dvec3 randomVec() {
-        return dvec3(randomDouble(), randomDouble(), randomDouble());
-    }
+    static dvec3 randomVec();
+
     /**
      * Returns a vector containing 3 random numbers in the given range
     */
-    inline static dvec3 randomVec(double min, double max) {
-        return dvec3(randomDouble(min, max), randomDouble(min, max), randomDouble(min, max));
-    }
+    static dvec3 randomVec(double min, double max);
 
     /**
      * Returns true if any of the given vector's coordinates are close to 0

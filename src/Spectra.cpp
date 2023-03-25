@@ -3,6 +3,26 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
+double Spectra::randomDouble() {
+    static std::uniform_real_distribution<double> distribution(0.0, 1.0);
+    static std::mt19937 generator(1);
+    return distribution(generator);
+}
+
+double Spectra::randomDouble(double min, double max) {
+    static std::uniform_real_distribution<double> distribution(min, max);
+    static std::mt19937 generator(1);
+    return distribution(generator);
+}
+
+static dvec3 Spectra::randomVec() {
+    return dvec3(randomDouble(), randomDouble(), randomDouble());
+}
+
+static dvec3 Spectra::randomVec(double min, double max) {
+    return dvec3(randomDouble(min, max), randomDouble(min, max), randomDouble(min, max));
+}
+
 void Spectra::writeImage(
         const char *fileName,
         int width,
