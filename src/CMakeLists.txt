@@ -5,13 +5,24 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 project(Spectra)
 
-if ( MSVC )
-    message("Detected MSVC.")
-    add_compile_options(/W4 /DEBUG:FULL)
-else ()
-    add_compile_options(-Wall -Wextra -Og -g)
+# Set the build type to release by default
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
 
-endif ()
+# Set compiler flags for release mode 
+if(MSVC)
+    set(CMAKE_CXX_FLAGS_RELEASE "/O2 /W4")
+else ()
+    set(CMAKE_CXX_FLAGS_RELEASE "-Wall -Wextra -O3")
+endif()
+
+# Set compiler flags for debug mode 
+if(MSVC)
+    set(CMAKE_CXX_FLAGS_DEBUG "/W4 /DEBUG:FULL /Od")
+else ()
+    set(CMAKE_CXX_FLAGS_DEBUG "-Wall -Wextra -Og -g")
+endif()
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
