@@ -213,6 +213,9 @@ int main() {
             }
             if (renderedAtLeastOnce)
                 ImGui::Text("%d samples finished.", renderer.samplesDone);
+            if (shouldRender)
+                if (ImGui::Button("Stop"))
+                    shouldRender = false;
             ImGui::End();
         }
 
