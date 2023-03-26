@@ -24,12 +24,12 @@ namespace Spectra {
     /**
      * Returns a vector containing 3 random numbers in the (0, 1) range
     */
-    static dvec3 randomVec();
+    dvec3 randomVec();
 
     /**
      * Returns a vector containing 3 random numbers in the given range
     */
-    static dvec3 randomVec(double min, double max);
+    dvec3 randomVec(double min, double max);
 
     /**
      * Returns true if any of the given vector's coordinates are close to 0

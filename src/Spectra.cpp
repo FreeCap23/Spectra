@@ -15,11 +15,11 @@ double Spectra::randomDouble(double min, double max) {
     return distribution(generator);
 }
 
-static dvec3 Spectra::randomVec() {
+dvec3 Spectra::randomVec() {
     return dvec3(randomDouble(), randomDouble(), randomDouble());
 }
 
-static dvec3 Spectra::randomVec(double min, double max) {
+dvec3 Spectra::randomVec(double min, double max) {
     return dvec3(randomDouble(min, max), randomDouble(min, max), randomDouble(min, max));
 }
 
