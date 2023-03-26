@@ -274,17 +274,28 @@ bool LoadTextureFromData(const uint8_t* data, GLuint* out_texture, int image_wid
 
 void createScene(Scene& scene) {
     auto matGround = std::make_shared<Lambertian>(dvec3(0.2, 0.8, 0.5));
-    auto matMirror = std::make_shared<Metal>(dvec3(1, 0.6, 0.8), 0.02);
+    auto matMirror = std::make_shared<Metal>(dvec3(1, 1, 1), 0.02);
 
     scene.addPlane(matGround, dvec3(0, 0, 1), 0);
     scene.addPlane(matMirror, dvec3(0, -1, 0), 3);
 
-    std::shared_ptr<Material> matSphere = std::make_shared<Metal>(dvec3(1), 0);
-    scene.addSphere(matSphere, dvec3(0, 0, 1.5), 1.5);
-
-    matSphere = std::make_shared<Lambertian>(dvec3(1));
-    scene.addSphere(matSphere, dvec3(-4, 0, 1.5), 1.5);
-
-    matSphere = std::make_shared<Lambertian>(dvec3(0.2));
-    scene.addSphere(matSphere, dvec3(4, 0, 1.5), 1.5);
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 8; j++) {
+            double picker = Spectra::randomDouble();
+            std::shared_ptr<Material> mat;
+            if (picker < 0.33) {
+                dvec3 color = Spectra::randomVec();
+                mat = std::make_shared<Lambertian>(color);
+            } else if (picker < 0.66) {
+                dvec3 color = Spectra::randomVec();
+                double roughness = Spectra::randomDouble();
+                mat = std::make_shared<Metal>(color, roughness);
+            } else {
+                double ior = Spectra::randomDouble();
+                mat = std::make_shared<Dielectric>(ior);
+            }
+            dvec3 position((j-3.5) * 1.25, (i-1.5) * 1.25, 0.5);
+            scene.addSphere(mat, position, 0.5);
+        }
+    }
 }
