@@ -55,6 +55,16 @@ int main() {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+    // Find the DPI of the screen to scale the font size with
+    float xscale, yscale;
+    glfwGetMonitorContentScale(glfwGetPrimaryMonitor(), &xscale, &yscale);
+    float fontScale = ceilf(13 * xscale);
+
+    // Add font
+    // This assumes the directory you launch the app from is build/release/ or build/debug/
+    io.Fonts->AddFontFromFileTTF("../../src/res/OpenSans-Regular.ttf", fontScale);
+
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
