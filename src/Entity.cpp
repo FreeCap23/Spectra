@@ -3,10 +3,9 @@
 bool Sphere::hit(Ray& ray, double t_min, double t_max, hitRecord& hits) const {
     // h = b/2
     float a, h, c;
-    a = glm::dot(ray.getDirection(), ray.getDirection());
-    h = glm::dot(ray.getDirection(), (ray.getOrigin() - m_center));
-    c = glm::dot((ray.getOrigin() - m_center), (ray.getOrigin() - m_center))
-        - m_radius * m_radius;
+    a = static_cast<float>(glm::dot(ray.getDirection(), ray.getDirection()));
+    h = static_cast<float>(glm::dot(ray.getDirection(), (ray.getOrigin() - m_center)));
+    c = static_cast<float>(glm::dot((ray.getOrigin() - m_center), (ray.getOrigin() - m_center)) - m_radius * m_radius);
     float determinant = h * h - a * c;
     // We compare to 0.01 to account for errors made by floating point
     // operations
