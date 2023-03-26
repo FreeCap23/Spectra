@@ -3,6 +3,7 @@
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 #include "GLFW/glfw3.h"
+#include "glm/gtc/type_ptr.hpp" // for glm::value_ptr()
 
 // Forward declarations
 
@@ -83,6 +84,10 @@ int main() {
     bool exportedFile = false;
     bool ortho = false;
     GLuint imageTexture = 0;
+    dvec3 cameraPos(0, -50, 35);
+    dvec3 cameraLookAt(4, 0, 1.5);
+    float fov = 10;
+    std::shared_ptr<Camera> camera;
     
     Scene scene;
     createScene(scene);
@@ -149,16 +154,13 @@ int main() {
                 memset(data, 0, 4 * renderOpts.width * renderOpts.height);
 
                 // Initialize camera
-                auto cam = std::shared_ptr<Camera>();
                 double aspectRatio = (double)renderOpts.width/renderOpts.height;
-                dvec3 position(0, -50, 35);
-                dvec3 lookAt(0, 0, 2);
                 if (ortho) {
-                    cam = std::make_shared<Orthographic>(5, aspectRatio, position, lookAt, dvec3(0, 0, 1));
+                    camera = std::make_shared<Orthographic>(fov, aspectRatio, cameraPos, cameraLookAt, dvec3(0, 0, 1));
                 } else {
-                    cam = std::make_shared<Perspective>(10, aspectRatio, position, lookAt, dvec3(0, 0, 1));
+                    camera = std::make_shared<Perspective>(fov, aspectRatio, cameraPos, cameraLookAt, dvec3(0, 0, 1));
                 }
-                scene.setCamera(cam);
+                scene.setCamera(camera);
 
                 // Reset previous render buffer
                 renderer.resetBuffer();
@@ -174,7 +176,27 @@ int main() {
                 }
 
             if (ImGui::CollapsingHeader("Camera options")) {
-                ImGui::Checkbox("Orthographic", &ortho);
+                if (ImGui::Checkbox("Orthographic", &ortho)) {
+                    double aspectRatio = (double)renderOpts.width / renderOpts.height;
+                    if (ortho) {
+                        camera = std::make_shared<Orthographic>(fov, aspectRatio, cameraPos, cameraLookAt, dvec3(0, 0, 1));
+                    } else {
+                        camera = std::make_shared<Perspective>(fov, aspectRatio, cameraPos, cameraLookAt, dvec3(0, 0, 1));
+                    }
+                    scene.setCamera(camera);
+                    renderer.resetBuffer();
+                }
+                if (
+                    ImGui::DragFloat("FOV", &fov, 0.2, 1, 180) || 
+                    ImGui::InputDouble("Camera X Position", &cameraPos.x, 0.1, 1) ||
+                    ImGui::InputDouble("Camera Y Position", &cameraPos.y, 0.1, 1) ||
+                    ImGui::InputDouble("Camera Z Position", &cameraPos.z, 0.1, 1) ||
+                    ImGui::InputDouble("Camera X Look At", &cameraLookAt.x, 0.1, 1) ||
+                    ImGui::InputDouble("Camera Y Look At", &cameraLookAt.y, 0.1, 1) ||
+                    ImGui::InputDouble("Camera Z Look At", &cameraLookAt.z, 0.1, 1) )
+                {
+                    renderer.resetBuffer(); // reset the image buffer to not get ghosting
+                }
             }
 
             if (exportedFile) 
