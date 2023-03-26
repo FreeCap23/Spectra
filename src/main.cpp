@@ -198,12 +198,12 @@ int main() {
                 }
                 if (
                     ImGui::DragFloat("FOV", &fov, 0.2, 1, 180) || 
-                    ImGui::InputDouble("Camera X Position", &cameraPos.x, 0.1, 1) ||
-                    ImGui::InputDouble("Camera Y Position", &cameraPos.y, 0.1, 1) ||
-                    ImGui::InputDouble("Camera Z Position", &cameraPos.z, 0.1, 1) ||
-                    ImGui::InputDouble("Camera X Look At", &cameraLookAt.x, 0.1, 1) ||
-                    ImGui::InputDouble("Camera Y Look At", &cameraLookAt.y, 0.1, 1) ||
-                    ImGui::InputDouble("Camera Z Look At", &cameraLookAt.z, 0.1, 1) )
+                    ImGui::InputDouble("X Position", &cameraPos.x, 0.1, 1) ||
+                    ImGui::InputDouble("Y Position", &cameraPos.y, 0.1, 1) ||
+                    ImGui::InputDouble("Z Position", &cameraPos.z, 0.1, 1) ||
+                    ImGui::InputDouble("X Look At", &cameraLookAt.x, 0.1, 1) ||
+                    ImGui::InputDouble("Y Look At", &cameraLookAt.y, 0.1, 1) ||
+                    ImGui::InputDouble("Z Look At", &cameraLookAt.z, 0.1, 1) )
                 {
                     renderer.resetBuffer(); // reset the image buffer to not get ghosting
                 }
