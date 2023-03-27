@@ -13,6 +13,7 @@ class Scene {
     void addSphere(std::shared_ptr<Material> mat, dvec3 center, double radius);
     void addPlane(std::shared_ptr<Material> mat, dvec3 normal, double distance);
     std::shared_ptr<Entity> getEntityAtIdx(int idx);
+    int getEntityCount();
     bool hit(Ray& ray, double t_min, double t_max, hitRecord& hits) const;
 
  public:

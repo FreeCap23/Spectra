@@ -12,6 +12,10 @@ std::shared_ptr<Entity> Scene::getEntityAtIdx(int idx) {
     return m_objects[idx];
 }
 
+int Scene::getEntityCount() {
+    return m_objects.size();
+}
+
 bool Scene::hit(Ray& ray, double t_min, double t_max, hitRecord& hits) const {
     hitRecord tempRec;
     bool hitAnything = false;

@@ -28,6 +28,8 @@ class Entity {
     virtual bool hit(Ray& ray, double t_min, double t_max, hitRecord& hits) const = 0;
 
     virtual void setMat(std::shared_ptr<Material> mat) = 0;
+
+    virtual std::shared_ptr<Material> getMat() const = 0;
 };
 
 class Sphere : public Entity {
@@ -41,6 +43,7 @@ class Sphere : public Entity {
     double getRadius() const { return m_radius; }
     virtual bool hit(Ray& ray, double t_min, double t_max, hitRecord& hits) const override;
     virtual void setMat(std::shared_ptr<Material> mat) override;
+    virtual std::shared_ptr<Material> getMat() const override;
 
  private:
     dvec3 m_center;
@@ -57,6 +60,7 @@ class Plane : public Entity {
         m_mat_ptr(mat_ptr) {}
     virtual bool hit(Ray& ray, double t_min, double t_max, hitRecord& hits) const override;
     virtual void setMat(std::shared_ptr<Material> mat) override;
+    virtual std::shared_ptr<Material> getMat() const override;
 
  private:
     dvec3 m_normal;

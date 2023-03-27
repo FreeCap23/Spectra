@@ -212,12 +212,47 @@ int main() {
             if (ImGui::CollapsingHeader("Object properties")) {
                 static int idx = 0, selMat;
                 const char* matList[] = {"Lambertian", "Metal", "Dielectric"};
-                ImGui::InputInt("Index", &idx, 1, 1);
-                ImGui::Combo("Material", &selMat, matList, 3, 3);
                 std::shared_ptr<Material> mat;
+                ImGui::InputInt("Index", &idx, 1, 1);
+                if (idx >= scene.getEntityCount()) {
+                    idx = scene.getEntityCount() - 1;
+                } else if (idx < 0) {
+                    idx = 0;
+                } 
+                mat = scene.getEntityAtIdx(idx)->getMat();
+                selMat = mat->getType();
+
+                // ImGui::Combo("Material", &selMat, matList, 3, 3);
+
+                if (ImGui::Combo("Material", &selMat, matList, 3, 3)) {
+                    dvec3 color = mat->getColor();
+                    double rough = mat->getRoughness();
+                    double ior = mat->getIor();
+                    if (selMat == 0) { // Lambertian
+                        if (color.r == 1)
+                            color = dvec3(0);
+                        mat = std::make_shared<Lambertian>(color);
+                    } else if (selMat == 1) { // Metal
+                        if (color.r == 1)
+                            color = dvec3(0);
+                        if (rough == -1)
+                            rough = 0;
+                        mat = std::make_shared<Metal>(color, rough);
+                    } else if (selMat == 2) { // Dielectric
+                        if (ior == -1)
+                            ior = 2;
+                        mat = std::make_shared<Dielectric>(ior);
+                    }
+                    scene.getEntityAtIdx(idx)->setMat(mat);
+                }
+
                 switch (selMat) {
                     case 0: { // Lambertian
                         float color[3];
+                        dvec3 vecColor = mat->getColor();
+                        color[0] = static_cast<float>(vecColor.r);
+                        color[1] = static_cast<float>(vecColor.g);
+                        color[2] = static_cast<float>(vecColor.b);
                         if (ImGui::ColorPicker3("Material color", &color[0])) {
                             mat = std::make_shared<Lambertian>(dvec3(color[0], color[1], color[2]));
                             scene.getEntityAtIdx(idx)->setMat(mat);
@@ -227,7 +262,11 @@ int main() {
                     }
                     case 1: { // Metal
                         float color[3];
-                        float rough;
+                        dvec3 vecColor = mat->getColor();
+                        color[0] = static_cast<float>(vecColor.r);
+                        color[1] = static_cast<float>(vecColor.g);
+                        color[2] = static_cast<float>(vecColor.b);
+                        float rough = static_cast<float>(mat->getRoughness());
                         if (
                             ImGui::ColorPicker3("Material color", &color[0]) || 
                             ImGui::SliderFloat("Roughness", &rough, 0, 1)
@@ -239,7 +278,7 @@ int main() {
                         break;
                     }
                     case 2: { // Dielectric
-                        float ior;
+                        float ior = static_cast<float>(mat->getIor());
                         if (ImGui::SliderFloat("Index of refraction", &ior, 0, 4)) {
                             mat = std::make_shared<Dielectric>(ior);
                             scene.getEntityAtIdx(idx)->setMat(mat);

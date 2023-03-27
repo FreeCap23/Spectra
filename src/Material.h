@@ -4,6 +4,12 @@
 
 struct hitRecord;
 
+enum materialTypes {
+    LAMBERTIAN,
+    METAL,
+    DIELECTRIC
+};
+
 class Material {
  public:
     virtual bool scatter(
@@ -12,6 +18,10 @@ class Material {
         dvec3& attenuation,
         Ray& scattered)
         const = 0;
+    virtual int getType() const = 0;
+    virtual dvec3 getColor() const = 0;
+    virtual double getRoughness() const = 0;
+    virtual double getIor() const = 0;
 };
 
 class Lambertian : public Material {
@@ -27,6 +37,24 @@ class Lambertian : public Material {
         scattered = Ray(hits.intersection, scatterDirection);
         attenuation = m_albedo;
         return true;
+    }
+
+    virtual int getType() const override {
+        return LAMBERTIAN;
+    }
+
+    virtual dvec3 getColor() const override {
+        return m_albedo;
+    }
+    
+    virtual double getRoughness() const override {
+        fprintf(stderr, "Roughness doesn't exist for Lambertian materials.\n");
+        return -1;
+    }
+
+    virtual double getIor() const override {
+        fprintf(stderr, "Ior doesn't exist for Lambertian materials.\n");
+        return -1;
     }
 
  private:
@@ -51,6 +79,23 @@ class Metal : public Material {
         scattered = Ray(hits.intersection, roughReflected);
         attenuation = m_albedo;
         return glm::dot(reflected, hits.normal) > 0;
+    }
+
+    virtual int getType() const override {
+        return METAL;
+    }
+
+    virtual dvec3 getColor() const override {
+        return m_albedo;
+    }
+    
+    virtual double getRoughness() const override {
+        return m_roughness;
+    }
+
+    virtual double getIor() const override {
+        fprintf(stderr, "Ior doesn't exist for Metal materials.\n");
+        return -1;
     }
 
  private:
@@ -85,6 +130,22 @@ class Dielectric : public Material {
             scatteredDir = glm::refract(unitDir, hits.normal, refractionRatio);
         scattered = Ray(hits.intersection, scatteredDir);
         return true;
+    }
+    virtual int getType() const override {
+        return DIELECTRIC;
+    }
+    virtual dvec3 getColor() const override {
+        fprintf(stderr, "Color doesn't exist for dielectric materials.\n");
+        return dvec3(-1);
+    }
+    
+    virtual double getRoughness() const override {
+        fprintf(stderr, "Roughness doesn't exist for dielectric materials.\n");
+        return -1;
+    }
+
+    virtual double getIor() const override {
+        return m_ior;
     }
  private:
     /**

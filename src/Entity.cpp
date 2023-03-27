@@ -51,3 +51,11 @@ void Plane::setMat(std::shared_ptr<Material> mat) {
 void Sphere::setMat(std::shared_ptr<Material> mat) {
     m_mat_ptr = mat;
 }
+
+std::shared_ptr<Material> Plane::getMat() const {
+    return m_mat_ptr;
+}
+
+std::shared_ptr<Material> Sphere::getMat() const {
+    return m_mat_ptr;
+}
