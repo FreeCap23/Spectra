@@ -95,8 +95,8 @@ int main() {
     bool ortho = false;
     GLuint imageTexture = 0;
     dvec3 cameraPos(0, -50, 35);
-    dvec3 cameraLookAt(4, 0, 1.5);
-    float fov = 10;
+    dvec3 cameraLookAt(0, 3, 0);
+    float fov = 8.2;
     std::shared_ptr<Camera> camera;
     
     Scene scene;
