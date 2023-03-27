@@ -13,6 +13,7 @@ struct hitRecord {
     std::shared_ptr<Material> mat_ptr;
     double t;
     bool frontFace;
+    int idx; // index of the hit object in the world vector
 
     inline void setFaceNormal(Ray ray, dvec3 outwardNormal) {
         frontFace = glm::dot(ray.getDirection(), outwardNormal) < 0;
@@ -25,6 +26,8 @@ class Entity {
     Entity() {}
 
     virtual bool hit(Ray& ray, double t_min, double t_max, hitRecord& hits) const = 0;
+
+    virtual void setMat(std::shared_ptr<Material> mat) = 0;
 };
 
 class Sphere : public Entity {
@@ -36,8 +39,8 @@ class Sphere : public Entity {
       m_mat_ptr(mat_ptr) {};
     dvec3 getCenter() const { return m_center; }
     double getRadius() const { return m_radius; }
-
     virtual bool hit(Ray& ray, double t_min, double t_max, hitRecord& hits) const override;
+    virtual void setMat(std::shared_ptr<Material> mat) override;
 
  private:
     dvec3 m_center;
@@ -53,6 +56,7 @@ class Plane : public Entity {
         m_distanceToOrigin(distanceToOrigin),
         m_mat_ptr(mat_ptr) {}
     virtual bool hit(Ray& ray, double t_min, double t_max, hitRecord& hits) const override;
+    virtual void setMat(std::shared_ptr<Material> mat) override;
 
  private:
     dvec3 m_normal;

@@ -209,6 +209,50 @@ int main() {
                 }
             }
 
+            if (ImGui::CollapsingHeader("Object properties")) {
+                static int idx = 0, selMat;
+                const char* matList[] = {"Lambertian", "Metal", "Dielectric"};
+                ImGui::InputInt("Index", &idx, 1, 1);
+                ImGui::Combo("Material", &selMat, matList, 3, 3);
+                std::shared_ptr<Material> mat;
+                switch (selMat) {
+                    case 0: { // Lambertian
+                        float color[3];
+                        if (ImGui::ColorPicker3("Material color", &color[0])) {
+                            mat = std::make_shared<Lambertian>(dvec3(color[0], color[1], color[2]));
+                            scene.getEntityAtIdx(idx)->setMat(mat);
+                            renderer.resetBuffer();
+                        }
+                        break;
+                    }
+                    case 1: { // Metal
+                        float color[3];
+                        float rough;
+                        if (
+                            ImGui::ColorPicker3("Material color", &color[0]) || 
+                            ImGui::SliderFloat("Roughness", &rough, 0, 1)
+                        ) {
+                            mat = std::make_shared<Metal>(dvec3(color[0], color[1], color[2]), rough);
+                            scene.getEntityAtIdx(idx)->setMat(mat);
+                            renderer.resetBuffer();
+                        }
+                        break;
+                    }
+                    case 2: { // Dielectric
+                        float ior;
+                        if (ImGui::SliderFloat("Index of refraction", &ior, 0, 4)) {
+                            mat = std::make_shared<Dielectric>(ior);
+                            scene.getEntityAtIdx(idx)->setMat(mat);
+                            renderer.resetBuffer();
+                        }
+                        break;
+                    }
+                    default: {
+                        ImGui::TextColored(ImVec4(1, 0, 0, 1), "Error selecting material");
+                    }
+                }
+            }
+
             if (exportedFile) 
                 ImGui::Text("Render saved to out.png");
 

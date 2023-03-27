@@ -4,7 +4,7 @@
 #include "Entity.h"
 #include "Camera.h"
 
-class Scene : public Entity {
+class Scene {
  public:
     Scene() {}
     void clear() { m_objects.clear(); }
@@ -12,7 +12,8 @@ class Scene : public Entity {
     void add(std::shared_ptr<Entity> obj) { m_objects.push_back(obj); }
     void addSphere(std::shared_ptr<Material> mat, dvec3 center, double radius);
     void addPlane(std::shared_ptr<Material> mat, dvec3 normal, double distance);
-    virtual bool hit(Ray& ray, double t_min, double t_max, hitRecord& hits) const override;
+    std::shared_ptr<Entity> getEntityAtIdx(int idx);
+    bool hit(Ray& ray, double t_min, double t_max, hitRecord& hits) const;
 
  public:
    std::shared_ptr<Camera> camera;
