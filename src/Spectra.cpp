@@ -1,7 +1,7 @@
 #include "Spectra.h"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb_image_write.h"
+#include "stb/stb_image_write.h"
 
 double Spectra::randomDouble() {
     static std::uniform_real_distribution<double> distribution(0.0, 1.0);
