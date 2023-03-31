@@ -59,7 +59,7 @@ int main() {
     // Find the DPI of the screen to scale the font size with
     float xscale, yscale;
     glfwGetMonitorContentScale(glfwGetPrimaryMonitor(), &xscale, &yscale);
-    float fontScale = ceilf(13 * xscale);
+    float fontScale = ceilf(16 * xscale);
 
     // Add font
     // This assumes the directory you launch the app from is build/release/ or build/debug/
