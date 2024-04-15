@@ -28,11 +28,13 @@ I've been interested in raytracing for some time, so I decided to try to write o
 - [Ray Tracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html)
 - [The Cherno's Ray Tracing](https://www.youtube.com/playlist?list=PLlrATfBNZ98edc5GshdBtREv5asFW3yXl)
 
-## Building
+## Building & Running
 To build Spectra you need CMake 3.2+ and a C++ Compiler such as g++ or MSVC.
 Also make sure to clone recursively.
 ```bash
 mkdir build
 cmake -S src -B build
 cmake --build build
+cd build/Release    # This is important. Spectra cannot load the font if it isn't launched from this directory
+./Spectra
 ```

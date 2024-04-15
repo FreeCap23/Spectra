@@ -35,7 +35,14 @@ set(SpectraSources main.cpp Camera.cpp Spectra.cpp Entity.cpp Scene.cpp Renderer
 set(ImGUISources imgui/imgui.cpp imgui/imgui_draw.cpp imgui/imgui_impl_glfw.cpp imgui/imgui_impl_opengl3.cpp imgui/imgui_tables.cpp imgui/imgui_widgets.cpp)
 
 include_directories(glfw/include/)
+
+# Create a subdirectory for the executable
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
+
+# Add the executable and set its output directory
 add_executable(Spectra ${SpectraSources} ${ImGUISources})
+set_target_properties(Spectra PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
 
 target_link_libraries(Spectra glfw)
 target_link_libraries(Spectra OpenGL::GL)
